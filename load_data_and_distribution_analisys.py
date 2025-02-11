@@ -203,11 +203,10 @@ def load_dataset_cleaned():
     return dataset_cleaned
 
 def sample_visualization(X_drink, X_smoke, y_drink, y_smoke):
-    scaler = StandardScaler()
-    X_smoke = scaler.fit_transform(X_smoke)
-    X_drink = scaler.fit_transform(X_drink)
+    X_smoke, X_drink = normalize_data(X_smoke, X_drink)
 
     X_smoke, y_smoke = X_smoke.sample(100000, random_state=42), y_smoke.loc[X_smoke.sample(100000, random_state=42).index]
+    print(X_smoke.shape, y_smoke.shape)
     X_drink, y_drink = X_drink.sample(100000, random_state=42), y_drink.loc[X_drink.sample(100000, random_state=42).index]
 
     reducer = umap.UMAP(n_components=2, random_state=42)
