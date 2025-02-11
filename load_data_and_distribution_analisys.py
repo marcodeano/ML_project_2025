@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import umap.umap_ as umap
 
 def load_data():
     # Download latest version
@@ -96,7 +97,7 @@ def print_outliers(dataset):
         lower_bound = Q1 - 1.5 * IQR
         upper_bound = Q3 + 1.5 * IQR
         
-        outliers = dataset_mod[(dataset_mod[col] < lower_bound) or (dataset_mod[col] > upper_bound)]
+        outliers = dataset_mod[(dataset_mod[col] < lower_bound) | (dataset_mod[col] > upper_bound)]
         print(f"Colonna: {col}")
         print(f"    -Valori fuori scala: {len(outliers)}")
         print(f"    -Limiti: {lower_bound} - {upper_bound}")
@@ -166,3 +167,63 @@ def normalize_data(X_smoke, X_drink):
     X_drink_scaled = pd.DataFrame(X_drink_scaled, columns=X_drink.columns)
 
     return X_smoke_scaled, X_drink_scaled
+
+def remove_outliers(dataset):
+    
+    thresholds = {
+    "waistline": 200,
+    "sight_left": 4,
+    "sight_right": 4,
+    "SBP": 240,
+    "DBP": 160,
+    "BLDS": 600,
+    "tot_chole": 1000,
+    "HDL_chole": 700,
+    "LDL_chole": 2000,
+    "triglyceride": 3500,
+    "serum_creatinine": 30,
+    "SGOT_AST": 2000,
+    "SGOT_ALT": 2000,
+    "gamma_GTP": 900,
+    }
+
+    for col, threshold in thresholds.items():
+        dataset.loc[dataset[col] > threshold, col] = None
+
+    # Rimozione delle righe con valori mancanti
+    dataset_cleaned = dataset.dropna(subset=thresholds.keys())
+
+    return dataset_cleaned
+
+def load_dataset_cleaned():
+    dataset = load_data()
+    categorical_encoding(dataset)
+    dataset_cleaned = remove_outliers(dataset)
+
+    return dataset_cleaned
+
+def sample_visualization(X_drink, X_smoke, y_drink, y_smoke):
+    scaler = StandardScaler()
+    X_smoke = scaler.fit_transform(X_smoke)
+    X_drink = scaler.fit_transform(X_drink)
+
+    X_smoke, y_smoke = X_smoke.sample(100000, random_state=42), y_smoke.loc[X_smoke.sample(100000, random_state=42).index]
+    X_drink, y_drink = X_drink.sample(100000, random_state=42), y_drink.loc[X_drink.sample(100000, random_state=42).index]
+
+    reducer = umap.UMAP(n_components=2, random_state=42)
+    X_smoke = reducer.fit_transform(X_smoke)
+    X_drink = reducer.fit_transform(X_drink)
+    df_smoke = pd.DataFrame(X_smoke, columns=["Componente 1", "Componente 2"])
+    df_smoke["Target"] = y_smoke.values
+    df_drink = pd.DataFrame(X_drink, columns=["Componente 1", "Componente 2"])
+    df_drink["Target"] = y_drink.values
+
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(data=df_smoke, x="Componente 1", y="Componente 2", hue="Target", palette="viridis", alpha=0.7)
+    plt.title("Visualizzazione UMAP del dataset Smoke")
+    plt.show()
+
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(data=df_drink, x="Componente 1", y="Componente 2", hue="Target", palette="viridis", alpha=0.7)
+    plt.title("Visualizzazione UMAP del dataset Drink")
+    plt.show()
