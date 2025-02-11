@@ -3,10 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.model_selection import train_test_split, cross_val_score, StratifiedKFold
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 def load_data():
@@ -168,3 +164,5 @@ def normalize_data(X_smoke, X_drink):
     X_drink_scaled = scaler.fit_transform(X_drink)
     X_smoke_scaled = pd.DataFrame(X_smoke_scaled, columns=X_smoke.columns)
     X_drink_scaled = pd.DataFrame(X_drink_scaled, columns=X_drink.columns)
+
+    return X_smoke_scaled, X_drink_scaled
