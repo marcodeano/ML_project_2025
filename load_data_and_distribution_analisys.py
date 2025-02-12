@@ -201,28 +201,3 @@ def load_dataset_cleaned():
     dataset_cleaned = remove_outliers(dataset)
 
     return dataset_cleaned
-
-def sample_visualization(X_drink, X_smoke, y_drink, y_smoke):
-    X_smoke, X_drink = normalize_data(X_smoke, X_drink)
-
-    X_smoke, y_smoke = X_smoke.sample(100000, random_state=42), y_smoke.loc[X_smoke.sample(100000, random_state=42).index]
-    print(X_smoke.shape, y_smoke.shape)
-    X_drink, y_drink = X_drink.sample(100000, random_state=42), y_drink.loc[X_drink.sample(100000, random_state=42).index]
-
-    reducer = umap.UMAP(n_components=2, random_state=42)
-    X_smoke = reducer.fit_transform(X_smoke)
-    X_drink = reducer.fit_transform(X_drink)
-    df_smoke = pd.DataFrame(X_smoke, columns=["Componente 1", "Componente 2"])
-    df_smoke["Target"] = y_smoke.values
-    df_drink = pd.DataFrame(X_drink, columns=["Componente 1", "Componente 2"])
-    df_drink["Target"] = y_drink.values
-
-    plt.figure(figsize=(10, 6))
-    sns.scatterplot(data=df_smoke, x="Componente 1", y="Componente 2", hue="Target", palette="viridis", alpha=0.7)
-    plt.title("Visualizzazione UMAP del dataset Smoke")
-    plt.show()
-
-    plt.figure(figsize=(10, 6))
-    sns.scatterplot(data=df_drink, x="Componente 1", y="Componente 2", hue="Target", palette="viridis", alpha=0.7)
-    plt.title("Visualizzazione UMAP del dataset Drink")
-    plt.show()

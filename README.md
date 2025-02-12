@@ -81,3 +81,10 @@ Per affrontare queste problematiche, nel progetto si adotteranno alcuni di quegl
 [1]https://www.kaggle.com/datasets/sooyoungher/smoking-drinking-dataset
 
 [2] https://www.digital4.biz/executive/medicina-e-intelligenza-artificiale-come-le-macchine-possono-migliorare-la-nostra-salute/
+
+# DA FARE 
+
+- Commentare come mai con feature engeneering non migliora la situa
+- Fare pca dopo feature engeneering
+- Fare stacking
+- Fare predittore ad-hoc
