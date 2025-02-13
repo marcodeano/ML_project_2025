@@ -86,3 +86,4 @@ Per affrontare queste problematiche, nel progetto si adotteranno alcuni di quegl
 
 - Commentare come mai con feature engeneering non migliora la situa
 - Commentare come mai con pca non migliora la situa
+- Testare le prove fatte ieri
