@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-import umap.umap_ as umap
 
 def load_data():
     # Download latest version

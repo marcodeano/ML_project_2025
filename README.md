@@ -85,6 +85,7 @@ Per affrontare queste problematiche, nel progetto si adotteranno alcuni di quegl
 # DA FARE 
 
 - Commentare come mai con feature engeneering non migliora la situa
+- Commentare come mai con pca non migliora la situa
 - Fare pca dopo feature engeneering
 - Fare stacking
 - Fare predittore ad-hoc
