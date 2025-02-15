@@ -2,6 +2,8 @@ import kagglehub
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
+from scipy import stats
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
@@ -167,23 +169,23 @@ def normalize_data(X_smoke, X_drink):
 
     return X_smoke_scaled, X_drink_scaled
 
-def remove_outliers(dataset):
+def remove_outliers_v1(dataset):
     
     thresholds = {
-    "waistline": 200,
+    "waistline": 400,
     "sight_left": 4,
     "sight_right": 4,
     "SBP": 240,
     "DBP": 160,
-    "BLDS": 600,
-    "tot_chole": 1000,
-    "HDL_chole": 700,
-    "LDL_chole": 2000,
-    "triglyceride": 3500,
-    "serum_creatinine": 30,
-    "SGOT_AST": 2000,
-    "SGOT_ALT": 2000,
-    "gamma_GTP": 900,
+    "BLDS": 700,
+    "tot_chole": 2000,
+    "HDL_chole": 7000,
+    "LDL_chole": 4000,
+    "triglyceride": 4500,
+    "serum_creatinine": 60,
+    "SGOT_AST": 6000,
+    "SGOT_ALT": 4000,
+    "gamma_GTP": 950,
     }
 
     for col, threshold in thresholds.items():
@@ -194,9 +196,19 @@ def remove_outliers(dataset):
 
     return dataset_cleaned
 
+def remove_outliers_v2(dataset):
+    # Calcolo dello z-score
+    z_scores = np.abs(stats.zscore(dataset.select_dtypes(include=['number'])))
+    threshold = 5
+    dataset_no_outliers = dataset[(z_scores < threshold).all(axis=1)]
+    dataset = dataset_no_outliers
+
+    return dataset
+
 def load_dataset_cleaned():
     dataset = load_data()
     categorical_encoding(dataset)
-    dataset_cleaned = remove_outliers(dataset)
+    dataset_cleaned = remove_outliers_v1(dataset)
+    dataset_cleaned = remove_outliers_v2(dataset_cleaned)
 
     return dataset_cleaned
