@@ -131,8 +131,45 @@ Ovviamente non ci siamo limitati ad utilizzare ed ottimizzare solamente il model
 I modelli allenati e testati sono stati:
 
 - **KNN:** rappresenta un metodo basato sulla similarità tra i dati, il che ci ha permesso di analizzare il comportamento del modello quando la decisione dipende strettamente dalla vicinanza ai punti nel dataset; questo modello è sicuramente utile perchè non ha bisogno di nessun tipo di assunzione per quanto riguarda i dati e permette di costruire dei "bound" tra le classi di tipo non lineare e di conseguenza permette di capire se le classi siano separabili nello spazio delle feature a disposizione.
-- **AdaBoost:**
-- **Support Vector Machine (kernel lineare):**
+- **AdaBoost (con base_estimator Albero Decisionale):** un modello di ensemble basato sul boosting e noto per la sua capacità di concentrarsi sugli errori commessi dai modelli più deboli nelle iterazioni precedenti, migliorando progressivamente la qualità della classificazione; abbiamo deciso di testare anche questo tipo di "modello" in modo da verificare se un metodo di ensemble focalizzato su un raffinamento iterativo potesse fornire risultati migliori rispetto a un metodo più stabile come Random Forest.
+- **Support Vector Machine (kernel lineare):** è un modello molto efficace nei problemi di classificazione, in particolare quando i dati sono ben separabili in uno spazio ad alta dimensione; nonostante sapessimo che difficilmente i sample del nostro dataset lo sarebbero stati, abbiamo deciso di testare anche questo tipo di modello per verificare empiricamente se una SVM con kernel lineare potesse comunque individuare un iperpiano di separazione efficace, magari grazie all’uso di margini ampi e alla capacità di gestire outlier con il parametro di penalizzazione.
+
+Ovviamente prima di allenare questi modelli, ci siamo assicurati di normalizzare i dati di train e test per ottenere le migliori performance possibili.
+
+Oltre a testare questi modelli nella loro versione base e con iperparametri ottimi, abbiamo anche testato l'applicazione di PCA come tecnica di Dimensionality Reduction (ovviamente solo per il modello KNN ed il modello SVM, per il modello AdaBoost con base_estimator Albero Decisionale abbiamo ritenuto fosse non necessario): difatto avendo a che fare con un dataset con 22 feature e avendo gia testato la tecnica della feature selection, volevamo valutare se la riduzione della dimensionalità tramite PCA potesse migliorare le prestazioni dei modelli.  Anche per quanto riguarda l'utilizzo di questa tecnica con i modelli sopra citati, non abbiamo creato un notebook contenente tutti i passaggi per selezionare il miglior numero di componenti da passare come parametro alla PCA, ma abbiamo lasciato solamente la versione che ci ha permesso di ottenere i migliori risultati.
+
+#### Notebook di riferimento:
+
+- `other_classifiers.ipynb`
+- `other_classifiers_with_pca.ipynb`
+
+### Feature engeneering
+
+Una volta testati tutti questi modelli predittivi di Machine Learning, abbiamo fatto delle ricerche inerenti il dominio di cui ci siamo occupati in questo progetto e abbiamo creato delle nuove feature in modo da creare un dataset con dei parametri differenti da quelli che avevamo a disposizione all'inizio; ovviamente l'obiettivo di tutto ciò è stato cercare di migliorare le performance dei nostri modelli predittivi estraendo informazioni più significative dalle feature esistenti o crearne di nuove che potessero contribuire a migliorare le performance dei classificatori.  
+
+[...Spiegazione delle nuove feature...]
+
+Visto che tramite l'aggiunta di queste nuove feature abbiamo incrementato la dimensionalità del dataset, abbiamo ritenuto opportuno fare dei test applicando anche la tecnica della PCA; c'è da precisare che abbiamo testato solo questa tecnica e non la Feature Reduction dopo l'aggiunta di queste nuove feature, per una questione di tempo per ottenere i risultati.  Abbiamo ritenuto che l'utilizzo della PCA fosse un test necessario da fare per provare ad estrarre pattern più significativivisto visto che tramite feature engeneering abbiamo aumentato il numero delle feature totali all'interno del dataset.
+
+#### Notebook di riferimento:
+
+- `feature_engeneering.ipynb`
+- `feature_engeneering_with_pca.ipynb`
+
+### Bagging ensemble
+
+Arrivati a questo punto del progetto non ci rimanevano molti modelli/tecniche da provare per migliorare i risultati già ottenuti, quindi una delle ultime tecniche di predizione che abbiamo testato è stata quella del bagging ensemble: una tecnica che consiste nel combinare i risultati ottenuti da più modelli per ottenere una predizione più accurata. I modelli che abbiamo utilizzato per fare bagging ensemble, sono stati AdaBoost e Support Vector Machine (kernel rbf), abbiamo scelto questi 2 modelli per le seguenti ragioni:
+
+- Volevamo provare a fondere la tecnica del boosting (caratteristica di AdaBoost) con la tecnica del bagging ensemble
+- Siccome il tempo per il training di un modello di SVM non lineare scala in maniera quadratica con il numero di sample, era proibitivo allenare un modello singolo di questo tipo anche solo utilizzando il 50% del dataset (500.000 sample); dunque abbiamo optato per utilizzare la tecnica dell'ensemble utilizzando più modelli SVM non lineari ma allenati ognuno su una porzione ristretta del dataset.
+
+Non abbiamo testato la tecnica del bagging ensemble per altri modelli come Random Forest perchè secondo il nostro parere non avrebbe apportato un beneficio significativo: nel caso della Random Forest il bagging è già un componente fondamentale del modello stesso in cui vengono costruiti più alberi su sottocampioni del dataset e poi aggregati tramite voto maggioritario, mentre per quanto riguarda KNN, il bagging non risulta particolarmente efficace perchè il suo comportamento dipende essenzialmente dalla scelta dei vicini più prossimi e dalla distanza utilizzata, piuttosto che dalla varianza del dataset.
+
+#### Notebook di riferimento:
+
+- `bagging_ensemble.ipynb`
+
+### Stacking Classifier e Voting Classifier
 
 ## Bibliografia
 
