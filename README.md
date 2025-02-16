@@ -183,3 +183,4 @@ Non abbiamo testato la tecnica del bagging ensemble per altri modelli come Rando
 - Commentare come mai con pca non migliora la situa
 - Aggiungere i link bibliografici
 - Fare un po' di cross validation
+- Far girare i notebook che separano le classi dello smoking
