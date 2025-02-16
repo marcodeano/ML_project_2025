@@ -22,7 +22,9 @@ Marco Giacopuzzi, matricola VR509643
 
 ### Presentazione del dataset
 
-Il dataset utilizzato in questo progetto[1], è un dataset tabellare composto da circa 1 milione di righe e 24 features, contenenti informazioni su vari parametri clinici e/o anagrafici degli individui; le features presenti includono sia dati numerici (misure biometriche) sia variabili categoriali (sesso).
+Il dataset utilizzato in questo progetto[1], è un dataset tabellare composto da circa 1 milione di righe e 24 features, contenenti 
+informazioni su vari parametri clinici e/o anagrafici degli individui; le features presenti includono sia dati numerici 
+(misure biometriche) sia variabili categoriali (sesso).
 
 Le label di classificazione considerate sono in tutto 2:
 
@@ -74,6 +76,15 @@ Tuttavia, questi modelli non possono essere applicati senza una selezione ragion
 
 Per raggiungere gli obiettivi che ci siamo prefissati, abbiamo eseguito in un ordine ben preciso determinati step che verranno descritti di seguito; durante tutti i test effettuati i risultati e le performance dei vari modelli/teniche utilizzate, sono stati monitorati tenendo in considerazione le classiche metriche di `Accuratezza`, `Precisione`, `Recall` ed `F1-score` ma dando più importanza all'`Accuratezza` per il caso della classificazione binaria dell'acool e all'`F1-score` per il caso della classificazione multiclasse del fumo. Quest'ultima scelta è stata fatta perchè l'F1-score risulta essere una metrica particolarmente utile nei problemi di classificazione multiclasse sbilanciata perché fornisce un bilanciamento tra precision e recall; inoltre evita che un modello sembri performante solo perché predice bene la classe più rappresentata e quindi un buon F1-score indica che il modello non solo riconosce le classi meno rappresentate, ma lo fa anche in modo preciso.  Oltre ciò, si è rivelato essenziale durante tutto il progetto l'utilizzo e la visualizzazione delle `Confusion Matrix`.
 
+Come si evincerà di seguito, nel nostro progetto abbiamo testato modelli di Machine Learning diversi cercando di valutare quale fosse più adatto al nostro problema di classificazione; ovviamente non ci siamo limitati a testare semplicemente i modelli base, ma abbiamo accompagnato ogni fase con diverse tecniche per migliorare la qualità dei dati da presentare in input ai modelli e ottimizzare le prestazioni dei modelli stessi. Abbiamo quindi adottato, a seconda anche del modello con cui stavamo lavorando, le seguenti tecniche: 
+
+- **Feature selection:** per ridurre la dimensionalità del dataset e migliorare l'efficienza dei modelli.
+- **Feature engeneering:** parallelamente alla feature selection, abbiamo anche cercato di creare, trasformare ed in generale ottimizzare le feature del dataset per migliorare le performance dei nostri modelli; più nel dettaglio abbiamo fatto delle ricerche inerenti il dominio di cui ci siamo occupati in questo progetto e abbiamo creato delle nuove feature in modo da ottenere un dataset con dei parametri differenti da quelli che avevamo a disposizione all'inizio e tutto ciò ovviamente con l'obiettivo di cercare di migliorare le performance dei nostri modelli predittivi.
+- **Ottimizzazione degli iperparametri:** tramite "Grid Search" sono stati testati i vari modelli con combinazioni di iperparametri differenti, con l'obiettivo di trovare quella che più si adatta al nostro problema.
+- **Principal Component Analysis:** per ridurre la dimensionalità mantenendo la maggior parte della varianza, per molti modelli predittivi risulta sempre utile apllicare la PCA.
+- **Tecniche di ensemble prediction:** spesso utilizzare solo un modello per fare predizioni su un dataset molto grande, non è la scelta migliore ed il rischio è che vengano fatte predizioni corrette per certe classi e per altre meno; proprio per questo sfrutteremo tecniche di ensemble prediction (come bagging, boosting e stacking) per cercare di predirre in maniera più robusta le classi dei vari sample.
+- **Classificazione gerarchica:** un ulteriore passo è stato l’introduzione di una strategia di classificazione gerarchica, particolarmente utile per gestire il problema dell’imbalanciamento delle classi soprattutto per la task sul fumo.
+
 ### Preprocessing e pulizia del dataset
 
 Prima di applicare qualsiasi modello di Machine Learning, è fondamentale preparare il dataset in modo che si possano sfruttare al meglio le potenzialità dei vari modelli di apprendimento; abbiamo dunque nell'ordine:  
@@ -98,23 +109,30 @@ Il modello che si è rivelato il migliore per quanto rifuarda la task di classif
 
 Abbiamo inizialmente testato un modello base di Random Forest, senza esplicitare i valori dei vari iperparametri, per ottenere dei primi risultati di riferimento e comprendere il comportamento del modello sui nostri dati; dopo aver valutato le metriche di performance, ci siamo resi conto che c'erano margini di miglioramento e abbiamo deciso di affinare il modello seguendo un approccio progressivo.
 
-Per prima cosa, abbiamo proceduto con un’ottimizzazione degli iperparametri sfruttando una "Grid Search" per affinare ulteriormente la ricerca; tra i parametri più rilevanti abbiamo considerato il numero di alberi nella foresta, la profondità massima degli alberi e il numero minimo di campioni richiesti per effettuare uno split, tenendo sempre monitorati tutte le metriche citate prima ma prestando particolare attenzione all'F1-score. Ci siamo subito accorti che, solo facendo una ricerca degli iperparametri ottimali, le metriche cominciavano a migliorare e la confusion matrix diventava sempre più bilanciata, con una riduzione degli errori di classificazione soprattutto nelle classi meno rappresentate; inoltre la confusion matrix ci ha permesso di individuare quali classi venivano maggiormente confuse tra loro, aiutandoci a comprendere dove il modello faticava maggiormente
+Per prima cosa, abbiamo proceduto con un’ottimizzazione degli iperparametri sfruttando una "Grid Search" per affinare ulteriormente la ricerca; tra i parametri più rilevanti abbiamo considerato il numero di alberi nella foresta, la profondità massima degli alberi e il numero minimo di campioni richiesti per effettuare uno split dei nodi, tenendo sempre monitorati tutte le metriche citate prima ma prestando particolare attenzione all'F1-score. Ci siamo subito accorti che, solo facendo una ricerca degli iperparametri ottimali, le metriche cominciavano a migliorare e la confusion matrix diventava sempre più bilanciata, con una riduzione degli errori di classificazione soprattutto nelle classi meno rappresentate; inoltre la confusion matrix ci ha permesso di individuare quali classi venivano maggiormente confuse tra loro, aiutandoci a comprendere dove il modello faticava maggiormente
 
 A questo punto, abbiamo provato ad ottimizzare la RandomForest sfruttando la tecnica della feature selection: avendo a che fare con un modello predittivo di questo tipo, ovvero abbastanza robusto alle feature irrilevanti, non ci aspettavamo un grosso miglioramento delle performance ma nonostante ciò rimane comunque un passaggio utile per poter eventualmente semplificare il modello andando a togliere anche poche feature e rendere il modello predittivo più veloce. Inoltre, non è stato indicato a priori un numero fissato di feature da selezionare, in quanto non certi di quelle che potessero essere le performance selezionando solo il 10%, il 20%, il 50%, il 75%... delle feature; quindi abbiamo implementato un algoritmo di feature selection di tipo Forward, monitorando la F1-score ad ogni "best_feature" aggiunta, e salvando la combinazione di feature migliore tra tutte quelle testate.
 
-Per validare ulteriormente il nostro approccio, abbiamo applicato la cross-validation utilizzando la tecnica StratifiedKFold, in modo da avere una valutazione più affidabile delle performance su diverse suddivisioni del dataset: siccome nello step precedente in cui abbiamo effettuato feature selection abbiamo allenato il nostro modello tenendo costante il set di train e di validazione, potremmo aver "overfittato" in base alla suddivisione specifica; con la cross-validation, testiamo il modello su diverse porzioni del dataset e possiamo valutare se le feature scelte hanno migliorato davvero il modello.
+Per validare ulteriormente il nostro approccio, abbiamo infine applicato la cross-validation utilizzando la tecnica `StratifiedKFold`, in modo da avere una valutazione più affidabile delle performance su diverse suddivisioni del dataset: siccome nello step precedente in cui abbiamo effettuato feature selection abbiamo allenato il nostro modello tenendo costante il set di train e di validazione, potremmo aver "overfittato" in base alla suddivisione specifica; con la cross-validation, testiamo il modello su diverse porzioni del dataset e possiamo valutare se le feature scelte hanno migliorato davvero il modello.
 
-Dopo tutte queste analisi, la Random Forest si è dimostrata un modello solido, in grado di ottenere buoni risultati con un tempo di addestramento contenuto; inoltre, come si è potuto evincere, non si sono rese necessarie operazioni come Scaling dei dati o RIPARTI DA QUA 
+Dopo tutte queste analisi, la Random Forest si è dimostrata un modello solido, in grado di ottenere buoni risultati con un tempo di addestramento contenuto; inoltre, come si è potuto evincere, non si sono rese necessarie operazioni come Scaling dei dati o Dimensionality Reduction e questo perchè il modello Random Forest non è influenzato da grandezze diverse tra le feature e gestisce bene dati ad alta dimensionalità.
 
+#### Notebook di riferimento:
 
-Abbiamo inoltre sperimentato l'uso della PCA (Principal Component Analysis) per verificare se la riduzione dimensionale potesse contribuire a migliorare l'efficienza e l'accuratezza dei modelli. Infine, abbiamo condotto una ricerca degli iperparametri ottimali attraverso tecniche di ottimizzazione come la grid search e la cross-validation, con l’obiettivo di massimizzare le metriche di valutazione e ottenere il miglior compromesso tra accuratezza e generalizzazione del modello.
+- `random_forest_classifier_base_model.ipynb`
+- `random_forest_classifier_with_feature_selection.ipynb`
+- `random_forest_classifier_cross_validation.ipynb`
 
-- **Feature selection:** per ridurre la dimensionalità del dataset e migliorare l'efficienza del modello.
-- **Ottimizzazione degli iperparametri:** tramite Grid Search verranno testati i vari modelli con combinazioni di iperparametri differenti, con l'obiettivo di trovare quella che più si adatta al nostro problema.
-- **Principal Component Analysis:** per ridurre la dimensionalità mantenendo la maggior parte della varianza, per molti modelli predittivi sarà necessario apllicare la PCA.
-- **Tecniche di ensemble prediction:** spesso utilizzare solo un modello per fare predizioni su un dataset molto grande, non è la scelta migliore ed il rischio è che vengano fatte predizioni corrette per certe classi e per altre meno; proprio per questo sfrutteremo tecniche di ensemble prediction (come bagging, boosting e stacking) per cercare di predirre in maniera più robusta le classi dei vari sample.
+### Altri classificatori
 
-### 
+# Altri classificatori testati
+
+Ovviamente non ci siamo limitati ad utilizzare ed ottimizzare solamente il modello di Random Forest, anzi abbiamo effettuato le stesse procedure fatte per tale modello anche con modelli totalmente differenti come filosofia; nel progetto non sono stati riportati tutti questi passaggi anche per questi modelli per non appesantire troppo il progetto, però abbiamo comunque riportato tutti i risultati per mettere in evidenza le differenze di performance tra i vari approcci e giustificare le scelte effettuate. 
+I modelli allenati e testati sono stati:
+
+- **KNN:** rappresenta un metodo basato sulla similarità tra i dati, il che ci ha permesso di analizzare il comportamento del modello quando la decisione dipende strettamente dalla vicinanza ai punti nel dataset; questo modello è sicuramente utile perchè non ha bisogno di nessun tipo di assunzione per quanto riguarda i dati e permette di costruire dei "bound" tra le classi di tipo non lineare e di conseguenza permette di capire se le classi siano separabili nello spazio delle feature a disposizione.
+- **AdaBoost:**
+- **Support Vector Machine (kernel lineare):**
 
 ## Bibliografia
 
@@ -127,3 +145,4 @@ Abbiamo inoltre sperimentato l'uso della PCA (Principal Component Analysis) per 
 - Commentare come mai con feature engeneering non migliora la situa
 - Commentare come mai con pca non migliora la situa
 - Aggiungere i link bibliografici
+- Fare un po' di cross validation
