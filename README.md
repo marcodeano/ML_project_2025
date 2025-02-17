@@ -141,7 +141,47 @@ Oltre a testare questi modelli nella loro versione base e con iperparametri otti
 
 Una volta testati tutti questi modelli predittivi di Machine Learning, abbiamo fatto delle ricerche inerenti il dominio di cui ci siamo occupati in questo progetto e abbiamo creato delle nuove feature in modo da creare un dataset con dei parametri differenti da quelli che avevamo a disposizione all'inizio; ovviamente l'obiettivo di tutto ciò è stato cercare di migliorare le performance dei nostri modelli predittivi estraendo informazioni più significative dalle feature esistenti o crearne di nuove che potessero contribuire a migliorare le performance dei classificatori.  
 
-[...Spiegazione delle nuove feature...]
+#### Caratteristiche antropometriche
+
+Queste caratteristiche offrono buoni indicatori circa lo stato fisico di un paziente, elementi che possono essere influenzati dal fumo e dal consumo di alcol.
+L'obesità e la distribuzione anomala del grasso sono condizioni che sono spesso correlate a comportamenti a rischio e possono essere identificate utilizzando questi parametri.
+
+- **BMI**: Misura l'obesità generale.
+- **wth_ratio**: Rapporto vita/altezza, indica l'obesità addominale.
+- **wtw_ratio**: Rapporto vita/peso, evidenzia la distribuzione del grasso.
+- **obesity_flag**: Flag per identificare rapidamente l'obesità.
+
+#### Caratteristiche Cardiovascolari
+
+Le caratteristiche cardiovascolari offrono indicazioni chiave sullo stato del sistema circolatorio, il quale può essere compromesso dal fumo e dal consumo di alcol.
+Questi parametri evidenziano anomalie pressorie e rigidità arteriosa, segnali indiretti di comportamenti a rischio.
+
+- **pulse_pressure**: Differenza tra SBP e DBP, indice di rigidità arteriosa.
+- **MAP**: Misura globale della pressione arteriosa.
+- **bp_category**: Classifica la pressione, rilevando eventuali anomalie.
+
+#### Profilo Lipidico e Rapporti Metabolici
+
+Queste caratteristiche metaboliche forniscono informazioni utili sullo stato cardiovascolare e metabolico dei pazienti.
+Forniscono anche informazioni sul modo in cui il fumo e il consumo di alcol possono alterare queste caratteristiche.
+Di conseguenza, un profilo lipidico instabile e un disequilibrio nei rapporti metabolici possono essere indicazioni indirette di un modo in cui uno vive uno stile di vita malsano.
+
+- **TC_HDL_ratio**: Indica il rischio cardiovascolare confrontando il colesterolo totale con l'HDL.
+- **LDL_HDL_ratio**: Evidenzia lo squilibrio tra il colesterolo “cattivo” e quello “buono”.
+- **non_HDL_chole**: Misura le particelle aterogeniche, segnale di potenziali patologie.
+- **triglyceride_hdl_ratio**: Riflette il rischio metabolico influenzato da dieta e stile di vita.
+- **AIP**: Valuta sinteticamente il rischio cardiovascolare tramite il logaritmo di trigliceridi/HDL.
+- **TyG**: Indica resistenza insulinica e rischio metabolico calcolando trigliceridi e glucosio.
+
+#### Funzione Epatica e Renale
+
+L'inclusione di indicatori per la funzione epatica e renale è vantaggiosa perché cambiamenti in questi parametri possono essere segnali indiretti di danni organici causati dal fumo e dal consumo di alcol.
+Queste azioni aiutano a identificare stili di vita a rischio fornendo informazioni sullo stato degli organi.
+
+- **AST_ALT_ratio**: Valori elevati possono indicare danni epatici da alcol.
+- **liver_enzyme_interaction**: Segnala anomalie enzimatiche legate all'abuso di alcol.
+- **liver_enzyme_avg**: Fornisce una panoramica rapida della funzione del fegato.
+- **eGFR**: Utile per rilevare danni renali associati a stili di vita non salutari.
 
 Visto che tramite l'aggiunta di queste nuove feature abbiamo incrementato la dimensionalità del dataset, abbiamo ritenuto opportuno fare dei test applicando anche la tecnica della PCA; c'è da precisare che abbiamo testato solo questa tecnica e non la Feature Reduction dopo l'aggiunta di queste nuove feature, per una questione di tempo per ottenere i risultati.  Abbiamo ritenuto che l'utilizzo della PCA fosse un test necessario da fare per provare ad estrarre pattern più significativivisto visto che tramite feature engeneering abbiamo aumentato il numero delle feature totali all'interno del dataset.
 
