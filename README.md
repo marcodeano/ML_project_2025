@@ -1102,6 +1102,5 @@ Di seguito vengono riportati i grafici della distribuzione nello spazio dei dati
 - Commentare come mai con feature engeneering non migliora la situa
 - Commentare come mai con pca non migliora la situa
 - Aggiungere i link bibliografici
-- Se i risultati di model stacking sono migliori con combinazioni diverse, cambia anche dentro i notebook "separation"
 - Sistemare il notebook di datavisualization
 - Aggiungere i parametri inseriti nei vari modelli
