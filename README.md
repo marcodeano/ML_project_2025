@@ -33,6 +33,17 @@ Le label di classificazione considerate sono in tutto 2:
 
 Il dataset presenta sbilanciamento per quanto riguarda le classi inerenti il fumo, con una distribuzione di circa 60% non fumatori, 15% ex-fumatori e 25% fumatori attuali, mentre la distribuzione delle classi inerenti il bere è bilanciata (50%-50%).
 
+Distribuzione delle classi:
+<p align="center">
+    <img src="screen_results/classes_distribution.png" alt="Classes Distribution" width="400" height="200">
+</p>
+
+Boxplot rappresentanti la distribuzione statistica dei valori delle varie feature:
+<p align="center">
+    <img src="screen_results/boxplot_feature1.png" alt="Classes Distribution" width="400" height="150">
+    <img src="screen_results/boxplot_feature2.png" alt="Classes Distribution" width="400" height="200">
+</p>
+
 Abbiamo deciso di lavorare con questo dataset per diversi motivi: 
 1. **Dimensioni del dataset e sua struttura:** essendo un dataset contenente quasi 1 milione di sample ed essendo ben strutturato con delle feature chiare ed esplicite, abbiamo ritenuto fosse adatto per simulare una situazione reale in cui viene richiesto di risolvere una task di classificazione dati dei parametri clinici di vari pazienti (per di più il dataset proviene da un sito governativo Coreano, dunque è effettivamente un dataset reale).  
 Inoltre non abbiamo dovuto spendere molto tempo per comprenderne il contenuto e non si sono rese necessarie operazioni di pre-processing eccessive.   
@@ -119,8 +130,6 @@ Dopo tutte queste analisi, la Random Forest si è dimostrata un modello solido, 
 - `random_forest_classifier_cross_validation.ipynb`
 
 ### Altri classificatori
-
-# Altri classificatori testati
 
 Ovviamente non ci siamo limitati ad utilizzare ed ottimizzare solamente il modello di Random Forest, anzi abbiamo effettuato le stesse procedure fatte per tale modello anche con modelli totalmente differenti come filosofia; nel progetto non sono stati riportati tutti questi passaggi anche per questi modelli per non appesantire troppo il progetto, però abbiamo comunque riportato tutti i risultati per mettere in evidenza le differenze di performance tra i vari approcci e giustificare le scelte effettuate. 
 I modelli allenati e testati sono stati:
@@ -248,7 +257,839 @@ Per farci un'idea più generale di quello che potesse essere la distribuzione ne
 
 ## Risultati
 
-## Conclusione
+In questa sezione vengono riportati i risultati ottenuti dai vari modelli di classificazione testati, confrontando le loro performance attraverso le metriche citate nella sezione relativa agli obiettivi del progetto e vengono inoltre riportate le confusion matrix per comprendere meglio come mai certi modelli risultano essere migliori di altri secondo noi.
+
+### Modello semplice Logistic Regression
+
+I risultati ottenuti grazie a questo modello, ci permetto di avere un punto di partenza per poter poi confrontare le prestazioni con quelle dei modelli allenati successivamente.
+
+#### Smoke
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.69      0.91      0.79    167528
+         2.0       0.40      0.09      0.15     47377
+         3.0       0.50      0.36      0.42     58574
+
+    accuracy                           0.65    273479
+   macro avg       0.53      0.45      0.45    273479
+weighted avg       0.60      0.65      0.60    273479
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_first_example_s.png" alt="Confusion Matrix first example" width="300" height="300">
+</p>
+
+#### Drink
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.70      0.70      0.70    135539
+           1       0.71      0.70      0.70    137940
+
+    accuracy                           0.70    273479
+   macro avg       0.70      0.70      0.70    273479
+weighted avg       0.70      0.70      0.70    273479
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_first_example_d.png" alt="Confusion Matrix first example" width="300" height="300">
+</p>
+
+### Random Forest
+
+Di seguito verranno invece riportati i risultati per quanto riguarda quello che abbiamo categorizzato come il miglior modello tra tutti quelli testati: la Random Forest; come si potrà evincere infatti, oltre ad avere la F1-score e l'accuratezza tra le più alte tra tutti i modelli testati, è anche il modello che riesce meglio a separare la classe dei "Non fumatori" dalla classe combinata "Fumatori e Ex-fumatori" e a sua volta è anche la migliore che riesce a separare queste ultime due (anche se comunque non in maniera ottimale). Per di più, proprio grazie a questi risultati ottenuti dalla Random Forest abbiamo avuto l'idea di testare un classificatore di tipo gerarchico, dunque si è rivelato un modello fondamentale per il nostro progetto.
+
+#### Smoke (modello base)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.82      0.84      0.83    167528
+         2.0       0.44      0.35      0.39     47377
+         3.0       0.51      0.56      0.54     58574
+
+    accuracy                           0.69    273479
+   macro avg       0.59      0.58      0.58    273479
+weighted avg       0.69      0.69      0.69    273479
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_rf_base_s.png" alt="Confusion Matrix random forest base" width="300" height="300">
+</p>
+
+#### Drink (modello base)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.72      0.71      0.72    135539
+           1       0.72      0.73      0.73    137940
+
+    accuracy                           0.72    273479
+   macro avg       0.72      0.72      0.72    273479
+weighted avg       0.72      0.72      0.72    273479
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_rf_base_d.png" alt="Confusion Matrix random forest base" width="300" height="300">
+</p>
+
+#### Smoke (modello ottimizzato con iperparametri ottimi e feature selection)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+Non fumatore       0.94      0.73      0.82    179990
+ Ex-fumatore       0.41      0.58      0.48     52103
+    Fumatore       0.49      0.64      0.55     63429
+
+    accuracy                           0.68    295522
+   macro avg       0.61      0.65      0.62    295522
+weighted avg       0.75      0.68      0.70    295522
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_rf_optimized_s.png" alt="Confusion Matrix random forest optimized" width="300" height="300">
+</p>
+
+#### Drink (modello ottimizzato con iperparametri ottimi e feature selection)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           Y       0.74      0.71      0.73    147869
+           N       0.72      0.75      0.74    147653
+
+    accuracy                           0.73    295522
+   macro avg       0.73      0.73      0.73    295522
+weighted avg       0.73      0.73      0.73    295522
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_rf_optimized_d.png" alt="Confusion Matrix random forest optimized" width="300" height="300">
+</p>
+
+#### Cross validation
+
+Siccome la Random Forest si è rivelato il modello migliore in assoluto, abbiamo anche pensato di fare cross-validation per valutare in maniera più precisa le performance del modello; siccome nello step della feature selection abbiamo allenato il nostro modello tenendo però costante il set di train e di validazione, potremmo aver "overfittato" in base alla suddivisione specifica, quindi con la cross-validation, abbiamo testato il modello su diverse porzioni del dataset per poter valutare in maniera esaustiva il modello.
+Specifichiamo che avremmo potuto effettuare la cross-validation anche per tutti gli altri modelli, ma vista la quantità di modelli testati ed il tempo necessario per compiere cross-validation ci siamo limitati a farla solo per il modello migliore tra tutti quelli testati.
+
+### Altri modelli (SVM lineare, KNN, AdaBoost)
+
+Per poter confrontare i risultati della Random Forest con tutti gli altri modelli testati, riportiamo anche i risultati di questi appena citati; come si potrà evincere, qualche modello (come SVM) si avvicina molto alle performance della Random Forest ma risulta comunque leggermente peggiore, mentre per altri modelli si noterà marcatamente la differenza non tanto di metriche come la F1-score quanto della capacità di classificare i sample appartenenti agli "Ex-fumatori" e "Fumatori". Purtroppo per quanto riguarda la classificazione riguardante il consumo di alcool, da adesso in poi rimarrà praticamente la medesima.
+
+#### AdaBoost (smoke)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.83      0.83      0.83    119747
+         2.0       0.45      0.32      0.37     34738
+         3.0       0.50      0.63      0.56     42530
+
+    accuracy                           0.70    197015
+   macro avg       0.59      0.59      0.59    197015
+weighted avg       0.69      0.70      0.69    197015
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_adaboost_s.png" alt="Confusion Matrix adaboost" width="300" height="300">
+</p>
+
+#### SVM (smoke)
+
+Metriche:
+```python
+Classification report per svm:
+              precision    recall  f1-score   support
+
+         1.0       0.94      0.73      0.82    119747
+         2.0       0.41      0.55      0.47     34738
+         3.0       0.47      0.65      0.55     42530
+
+    accuracy                           0.68    197015
+   macro avg       0.61      0.64      0.61    197015
+weighted avg       0.75      0.68      0.70    197015
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_svm_s.png" alt="Confusion Matrix svm" width="300" height="300">
+</p>
+
+#### KNN (smoke)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.85      0.80      0.83    119747
+         2.0       0.44      0.43      0.43     34738
+         3.0       0.49      0.59      0.54     42530
+
+    accuracy                           0.69    197015
+   macro avg       0.60      0.61      0.60    197015
+weighted avg       0.70      0.69      0.70    197015
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_knn_s.png" alt="Confusion Matrix knn" width="300" height="300">
+</p>
+
+#### AdaBoost (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.73      0.73      0.73     98396
+           1       0.73      0.73      0.73     98619
+
+    accuracy                           0.73    197015
+   macro avg       0.73      0.73      0.73    197015
+weighted avg       0.73      0.73      0.73    197015
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_adaboost_d.png" alt="Confusion Matrix adaboost" width="300" height="300">
+</p>
+
+#### SVM (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.72      0.72      0.72     98396
+           1       0.72      0.72      0.72     98619
+
+    accuracy                           0.72    197015
+   macro avg       0.72      0.72      0.72    197015
+weighted avg       0.72      0.72      0.72    197015
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_svm_d.png" alt="Confusion Matrix svm" width="300" height="300">
+</p>
+
+#### KNN (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.73      0.67      0.70     98396
+           1       0.70      0.76      0.73     98619
+
+    accuracy                           0.71    197015
+   macro avg       0.72      0.71      0.71    197015
+weighted avg       0.72      0.71      0.71    197015
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_knn_d.png" alt="Confusion Matrix knn" width="300" height="300">
+</p>
+
+### Altri modelli con PCA (SVM lineare, KNN)
+
+Come già accennato nella sezione precedente, abbiamo anche testato l'utilizzo della PCA per quanto riguarda i modelli KNN e SVM; purtroppo i risultati non hanno portato a dei miglioramenti.
+
+#### SVM (smoke)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.91      0.75      0.82    119747
+         2.0       0.42      0.50      0.46     34738
+         3.0       0.47      0.64      0.54     42530
+
+    accuracy                           0.68    197015
+   macro avg       0.60      0.63      0.61    197015
+weighted avg       0.73      0.68      0.70    197015
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_svm_pca_s.png" alt="Confusion Matrix svm con pca" width="300" height="300">
+</p>
+
+#### KNN (smoke)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.85      0.81      0.83    119747
+         2.0       0.44      0.41      0.42     34738
+         3.0       0.49      0.58      0.53     42530
+
+    accuracy                           0.69    197015
+   macro avg       0.59      0.60      0.59    197015
+weighted avg       0.70      0.69      0.69    197015
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_knn_pca_s.png" alt="Confusion Matrix knn con pca" width="300" height="300">
+</p>
+
+#### SVM (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.71      0.72      0.71     98396
+           1       0.72      0.71      0.71     98619
+
+    accuracy                           0.71    197015
+   macro avg       0.71      0.71      0.71    197015
+weighted avg       0.71      0.71      0.71    197015
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_svm_pca_d.png" alt="Confusion Matrix svm con pca" width="300" height="300">
+</p>
+
+#### KNN (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.73      0.67      0.70     98396
+           1       0.70      0.75      0.72     98619
+
+    accuracy                           0.71    197015
+   macro avg       0.72      0.71      0.71    197015
+weighted avg       0.72      0.71      0.71    197015
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_knn_pca_d.png" alt="Confusion Matrix knn con pca" width="300" height="300">
+</p>
+
+### Feature Engeneering (Random Forest, AdaBoost, SVM lineare, KNN)
+
+Il tentativo di fare feature engeneering, è stato un test che non sapevamo se ed eventualmente in che misura avrebbe influito sui risultati; noi ci siamo limitato ad aggregare le nuove feature ricavate a quelle già esistenti e sicuramente avremmo potuto fare delle prove differenti, per esempio utilizzando solo le nuove feature, oppure facendo feature selection, oppure ancora facendo delle trasformazioni differenti da quelle attuate da noi. Purtroppo anche in questo caso le performance non sono migliorate rispetto agli step precedenti, però comunque le metriche sono rimaste più o meno invariate, segno che le feature aggiunte non hanno causato overfitting o altri tipi di problemi.
+
+#### Random Forest (smoke)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.94      0.73      0.82    120489
+         2.0       0.42      0.58      0.48     34990
+         3.0       0.49      0.64      0.56     42791
+
+    accuracy                           0.68    198270
+   macro avg       0.62      0.65      0.62    198270
+weighted avg       0.75      0.68      0.70    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_feature_engeneering_rf_s.png" alt="Confusion Matrix rf con feature engeneering" width="300" height="300">
+</p>
+
+#### AdaBoost (smoke)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.83      0.83      0.83    120489
+         2.0       0.44      0.32      0.37     34990
+         3.0       0.51      0.62      0.56     42791
+
+    accuracy                           0.70    198270
+   macro avg       0.59      0.59      0.59    198270
+weighted avg       0.69      0.70      0.69    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_feature_engeneering_adaboost_s.png" alt="Confusion Matrix adaboost con feature engeneering" width="300" height="300">
+</p>
+
+#### SVM (smoke)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.94      0.73      0.82    120489
+         2.0       0.41      0.55      0.47     34990
+         3.0       0.48      0.65      0.55     42791
+
+    accuracy                           0.68    198270
+   macro avg       0.61      0.64      0.61    198270
+weighted avg       0.75      0.68      0.70    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_feature_engeneering_svm_s.png" alt="Confusion Matrix svm con feature engeneering" width="300" height="300">
+</p>
+
+#### KNN (smoke)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.84      0.81      0.83    120489
+         2.0       0.43      0.38      0.41     34990
+         3.0       0.49      0.58      0.53     42791
+
+    accuracy                           0.69    198270
+   macro avg       0.59      0.59      0.59    198270
+weighted avg       0.69      0.69      0.69    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_feature_engeneering_knn_s.png" alt="Confusion Matrix knn con feature engeneering" width="300" height="300">
+</p>
+
+#### Random Forest (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.74      0.72      0.73     99172
+           1       0.73      0.75      0.74     99098
+
+    accuracy                           0.73    198270
+   macro avg       0.73      0.73      0.73    198270
+weighted avg       0.73      0.73      0.73    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_feature_engeneering_rf_d.png" alt="Confusion Matrix rf con feature engeneering" width="300" height="300">
+</p>
+
+#### AdaBoost (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.73      0.73      0.73     99172
+           1       0.73      0.74      0.73     99098
+
+    accuracy                           0.73    198270
+   macro avg       0.73      0.73      0.73    198270
+weighted avg       0.73      0.73      0.73    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_feature_engeneering_adaboost_d.png" alt="Confusion Matrix adaboost con feature engeneering" width="300" height="300">
+</p>
+
+#### SVM (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.73      0.72      0.72     99172
+           1       0.72      0.73      0.72     99098
+
+    accuracy                           0.72    198270
+   macro avg       0.72      0.72      0.72    198270
+weighted avg       0.72      0.72      0.72    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_feature_engeneering_svm_d.png" alt="Confusion Matrix svm con feature engeneering" width="300" height="300">
+</p>
+
+#### KNN (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.73      0.67      0.70     99172
+           1       0.70      0.76      0.73     99098
+
+    accuracy                           0.71    198270
+   macro avg       0.72      0.71      0.71    198270
+weighted avg       0.72      0.71      0.71    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_feature_engeneering_knn_d.png" alt="Confusion Matrix knn con feature engeneering" width="300" height="300">
+</p>
+
+### Feature Engeneering con PCA (SVM lineare, KNN)
+
+Per la stessa ragione del caso senza feature engeneering, abbiamo ritenuto opportuno provare ad applicare una PCA ai modelli SVM e KNN; per di più aver aumentato il numero di feature, ha imcrementato la dimensionalità del dataset e dunque abbiamo ritenuto opportuno apllicare una tecnica di dimensionality reduction per cercare di estrarre eventualmente dei pattern più significativi.
+
+#### SVM (smoke)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.89      0.76      0.82    120489
+         2.0       0.41      0.44      0.43     34990
+         3.0       0.48      0.63      0.54     42791
+
+    accuracy                           0.68    198270
+   macro avg       0.59      0.61      0.60    198270
+weighted avg       0.71      0.68      0.69    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_feature_engeneering_pca_svm_s.png" alt="Confusion Matrix svm con feature engeneering e pca" width="300" height="300">
+</p>
+
+#### KNN (smoke)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.82      0.82      0.82    120489
+         2.0       0.43      0.34      0.38     34990
+         3.0       0.49      0.57      0.53     42791
+
+    accuracy                           0.68    198270
+   macro avg       0.58      0.58      0.58    198270
+weighted avg       0.68      0.68      0.68    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_feature_engeneering_pca_knn_s.png" alt="Confusion Matrix knn con feature engeneering e pca" width="300" height="300">
+</p>
+
+#### SVM (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.72      0.72      0.72     99172
+           1       0.72      0.72      0.72     99098
+
+    accuracy                           0.72    198270
+   macro avg       0.72      0.72      0.72    198270
+weighted avg       0.72      0.72      0.72    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_feature_engeneering_pca_svm_d.png" alt="Confusion Matrix svm con feature engeneering e pca" width="300" height="300">
+</p>
+
+#### KNN (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.73      0.68      0.70     99172
+           1       0.70      0.75      0.72     99098
+
+    accuracy                           0.71    198270
+   macro avg       0.71      0.71      0.71    198270
+weighted avg       0.71      0.71      0.71    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_feature_engeneering_pca_knn_d.png" alt="Confusion Matrix knn con feature engeneering e pca" width="300" height="300">
+</p>
+
+### Bagging Ensemble
+
+Siccome il tempo di train di un modello di tipo SVM con kernel non lineare cresce quadraticamente con la grandezza del dataset, si è reso impossibile testare un modello di questo tipo; come soluzione per provare comunque a osservare se fosse possibile ottenere dei risultati interessanti con tale modello, abbiamo provato utilizzare la tecnica di predizione del Bagging Ensemble.  C'è da specificare che ogni modello base di SVM non lineare è stato allenato solo sul 10% del dataset, dunque i risultati non sono apprezzabili totalmente.  Inoltre, per testare anche la combinazione della tecnica del Bagging con quella del Boosting, in questo tipo di test abbiamo utilizzato anche il classificatore AdaBoost.
+
+#### AdaBoost (smoke)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.84      0.82      0.83    120582
+         2.0       0.44      0.27      0.34     34919
+         3.0       0.49      0.65      0.56     42769
+
+    accuracy                           0.69    198270
+   macro avg       0.59      0.58      0.57    198270
+weighted avg       0.69      0.69      0.68    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_bagging_adaboost_s.png" alt="Confusion Matrix bagging adaboost" width="300" height="300">
+</p>
+
+#### AVM (smoke)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.82      0.84      0.83    120582
+         2.0       0.45      0.31      0.37     34919
+         3.0       0.50      0.59      0.54     42769
+
+    accuracy                           0.69    198270
+   macro avg       0.59      0.58      0.58    198270
+weighted avg       0.68      0.69      0.68    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_bagging_svm_s.png" alt="Confusion Matrix bagging svm" width="300" height="300">
+</p>
+
+#### AdaBoost (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.72      0.73      0.72     99595
+           1       0.72      0.72      0.72     98675
+
+    accuracy                           0.72    198270
+   macro avg       0.72      0.72      0.72    198270
+weighted avg       0.72      0.72      0.72    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_bagging_svm_d.png" alt="Confusion Matrix bagging adaboost" width="300" height="300">
+</p>
+
+#### SVM (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.73      0.71      0.72     99595
+           1       0.72      0.73      0.73     98675
+
+    accuracy                           0.72    198270
+   macro avg       0.72      0.72      0.72    198270
+weighted avg       0.72      0.72      0.72    198270
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_bagging_svm_d.png" alt="Confusion Matrix bagging svm" width="300" height="300">
+</p>
+
+### Stacking Classifier e Voting Classifier
+
+Uno dei nostri ultimi tentativi di migliorare i risultati della Random Forest, è stato quello di sfruttare due tecniche di Ensemble differenti dal Bagging ed il Boosting: lo Stacking ed il Voting Classifier; abbiamo pensato infatti che potesse essere conveniente combinare la predizione proveniente da modelli diversi come filosofia, però purtroppo anche per quanto riguarda questo test abbiamo ottenuto più o meno gli stessi risultati.
+
+#### Stacking (smoke)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.89      0.79      0.83    111686
+         2.0       0.44      0.44      0.44     31585
+         3.0       0.50      0.66      0.57     39049
+
+    accuracy                           0.70    182320
+   macro avg       0.61      0.63      0.61    182320
+weighted avg       0.73      0.70      0.71    182320
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_stacking_s.png" alt="Confusion Matrix stacking" width="300" height="300">
+</p>
+
+#### Voting (smoke)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.93      0.74      0.83    111686
+         2.0       0.43      0.53      0.47     31585
+         3.0       0.48      0.66      0.56     39049
+
+    accuracy                           0.69    182320
+   macro avg       0.61      0.65      0.62    182320
+weighted avg       0.75      0.69      0.71    182320
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_voting_s.png" alt="Confusion Matrix voting" width="300" height="300">
+</p>
+
+#### Stacking (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.73      0.71      0.72     90360
+           1       0.72      0.74      0.73     91960
+
+    accuracy                           0.73    182320
+   macro avg       0.73      0.73      0.73    182320
+weighted avg       0.73      0.73      0.73    182320
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_stacking_d.png" alt="Confusion Matrix stacking" width="300" height="300">
+</p>
+
+#### Voting (drink)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.74      0.68      0.71     90360
+           1       0.71      0.76      0.73     91960
+
+    accuracy                           0.72    182320
+   macro avg       0.72      0.72      0.72    182320
+weighted avg       0.72      0.72      0.72    182320
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_voting_d.png" alt="Confusion Matrix voting" width="300" height="300">
+</p>
+
+### Classificatore gerarchico (classificazione smoke)
+
+Per quanto riguarda la classificazione sul fumo, che alla fine è stato al centro del nostro progetto più della classificazione sull'alcool, abbiamo fatto un ultimo tentativo per cercare di ottenere un modello di predizione che migliorasse le metriche ottenute fino a questo punto, implementando un classificatore gerarchico; purtoppo, come già accennato nella sezione relativa alla spiegazione dei modelli utilizzati nel progetto non siamo riusciti nel nostro intento per verie ragioni, anche se il risultato finale si avvicina molto alle performance ottenute dal modello Random Forest.  C'è però da fare una precisazione: nonostante questo modello di classificazione gerarchica non sia stato creato come era nostro intento, siamo convinti che la filosofia di creare un modello predittivo di questo tipo sia la carta vincente per poter ottenere il miglior modello possibile per questo tipo di dataset. Idealmente, infatti, allenando prima un modello che separi nel miglior modo possibile le classi "Non-fumatore" e "Ex-fumatore o Fumatore" ed in un secondo momento un modello che sappia separare meglio possibile le classi "Ex-fumatore" e "Fumatore" si dovrebbe riuscire ad ottenere una "pipeline" che sia in grado di occuparsi step by step della suddivisione dei sample. 
+
+#### Best separator non smokers-smokers/ex smokers (Stacking Classifier)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+           0       0.93      0.75      0.83    111686
+           1       0.69      0.91      0.79     70634
+
+    accuracy                           0.81    182320
+   macro avg       0.81      0.83      0.81    182320
+weighted avg       0.84      0.81      0.81    182320
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_separation1.png" alt="Confusion Matrix stacking" width="300" height="300">
+</p>
+
+#### Best separator ex smokers-smokers (Random Forest)
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         2.0       0.62      0.60      0.61     31585
+         3.0       0.68      0.71      0.70     39049
+
+    accuracy                           0.66     70634
+   macro avg       0.65      0.65      0.65     70634
+weighted avg       0.66      0.66      0.66     70634
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_separation2.png" alt="Confusion Matrix rf" width="300" height="300">
+</p>
+
+#### Test classificatore gerarchico
+
+Metriche:
+```python
+              precision    recall  f1-score   support
+
+         1.0       0.94      0.73      0.82    111704
+         2.0       0.41      0.55      0.47     31616
+         3.0       0.48      0.65      0.55     39085
+
+    accuracy                           0.68    182405
+   macro avg       0.61      0.64      0.61    182405
+weighted avg       0.75      0.68      0.70    182405
+```
+
+Confusion matrix:
+<p align="center">
+    <img src="screen_results/confusion_matrix_multistep_s.png" alt="Confusion Matrix rf" width="300" height="300">
+</p>
+
+### Visualization separation of classes
+
+Di seguito vengono riportati i grafici della distribuzione nello spazio dei dati presenti nel dataset, ottenuti sfruttando le tecniche di t-SNE e PCA; in questo modo abbiamo potuto visualizzare quanto effettivamente le classi del nostro dataset fossero sovrapposte tra di loro.  Ovviamente per rendere il tutto più comprensibile, abbiamo "plottato" il tutto in uno spazio a 2 dimensioni e considerando in un primo momento le label "Non-fumatore" e "Ex-fumatore o Fumatore" accorpate in una unica classe ed in un secondo momento le classi "Ex-fumatore" e "Fumatore".  Come si può evincere, la divisione "Non-fumatore" e "Ex-fumatore o Fumatore" è abbastanza marcata e facile da individuare, mentre per l'altra divisione si nota una netta sovrapposizione dei dati delle due classi, suggerendo dunque la difficoltà nel riuscire a distinguere in maniera anche solo parziale le due classi.  Per ottenere risultati in tempi contenuti, abbiamo utilizzato solo il 10% del dataset.
+
+#### t-SNE "Non-fumatore" e "Ex-fumatore o Fumatore" 
+
+<p align="center">
+    <img src="screen_results/tSNE_smoking_non_smoking.png" alt="tSNE smoking non smoking" width="400" height="400">
+</p>
+
+#### PCA "Non-fumatore" e "Ex-fumatore o Fumatore" 
+
+<p align="center">
+    <img src="screen_results/pca_smoking_non_smoking.png" alt="PCA smoking non smoking" width="400" height="400">
+</p>
+
+#### t-SNE "Ex-fumatore" e "Fumatore" 
+
+<p align="center">
+    <img src="screen_results/tSNE_smoking_ex_smoking.png" alt="tSNE smoking ex smoking" width="400" height="400">
+</p>
+
+#### PCA "Ex-fumatore" e "Fumatore" 
+
+<p align="center">
+    <img src="screen_results/pca_smoking_ex_smoking.png" alt="PCA smoking ex smoking" width="400" height="400">
+</p>
+
+## Conclusioni
 
 ## Bibliografia
 
@@ -263,3 +1104,4 @@ Per farci un'idea più generale di quello che potesse essere la distribuzione ne
 - Aggiungere i link bibliografici
 - Se i risultati di model stacking sono migliori con combinazioni diverse, cambia anche dentro i notebook "separation"
 - Sistemare il notebook di datavisualization
+- Aggiungere i parametri inseriti nei vari modelli
