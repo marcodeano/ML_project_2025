@@ -14,7 +14,6 @@ Marco Giacopuzzi, matricola VR509643
 - **Dataset preso in analisi ed obiettivi del progetto**
 - **State Of The Art**
 - **Metodologie, modelli ed algoritmi utilizzati**
-- **Procedure seguite e risultati ottenuti**
 - **Conclusioni**
 - **Biliografia**
 
@@ -44,18 +43,13 @@ D'altronde in un caso di ricovero di un individuo per motivi di salute, potrebbe
 3. **Obiettivo del progetto non banale:** nonostente il dataset preveda per il caso del fumo di fare una classificazione con sole 3 classi e per il caso dell'alcool di fare una classificazione binaria, riteniamo che classificare un paziente come "Fumatore", "Ex-fumatore" o "Non fumatore" non sia per nulla banale; non sappiamo infatti da quanto tempo eventualmente i pazienti hanno smesso di fumare, con che frequenza fumano oppure se hanno dei parametri clinici anomali per via di altre malattie.  
 Difatti, come si evincerà meglio nel proseguio del progetto, abbiamo concentrato molte delle nostre energie nel tentare di migliorare il più possibile la predizione per il caso del fumo e questo proprio perchè si è rivelata una task per nulla banale.
 
-<!-- 3. **Task diverse per un solo datset:** proprio per il motivo appena citato, il dataset si presta bene oltre che per un problema di classificazione binaria e multiclasse, anche ad un problema di clustering: infatti non sappiamo di preciso se le groud truth presenti nel dataset sono effettivamente reali oppure no, quindi abbiamo pensato che fosse una buona idea utilizzare il dataset per una task di questo tipo.  
-In questo modo potremmo eventualmente individuare gli individui che presumibilmente hanno mentito a riguardo del consumo di alcool o fumo. -->
-
 ### Obiettivo del progetto
 
 Come è facilamente intuibile dal paragrafo precedente, l'obiettivo principale del nostro progetto è:
 
 - Creare un modello che cerchi di classificare correttamente il maggior numero possibile di sample sia per il caso del fumo che dell'alcool; nonostante però durante tutto lo svolgimento del progetto si sia cercato di migliorare i risultati per entrambe le task di classificazione, alla fine i nostri sforzi principali sono stati dedicati alla classificazione multiclasse del caso del fumo (per tutti i motivi descritti sopra).
-- ALTRO???
-<!-- - Creare un modello che divida il dataset in cluster, in modo da darci una stima del numero di individui che hanno mentito a riguardo del consumo di alcool o fumo. -->
 
-Cercheremo di raggiungere questi obiettivi per step iniziando con dei modelli più semplici e proseguendo con degli altri più complessi o comunque diversi come filosofia; durante tutto lo svolgimento del progetto verranno comunque monitorati costantemente i risultati delle predizioni dei vari modelli e cercheremo di volta in volta di migliorarli sempre di più.
+Cercheremo di raggiungere questo obiettivo per step iniziando con dei modelli più semplici e proseguendo con degli altri più complessi o comunque diversi come filosofia; durante tutto lo svolgimento del progetto verranno comunque monitorati costantemente i risultati delle predizioni dei vari modelli e cercheremo di volta in volta di migliorarli sempre di più.
 
 ## State Of The Art (accenni)
 
@@ -184,27 +178,30 @@ Altre 2 tecniche di ensemble che abbiamo testato, sono state lo Stacking e il Vo
 
 Arrivati a questo punto del progetto, ci siamo resi conto che l'obiettivo di separare in maniera sempre più precisa la classe dei Fumatori da quella degli Ex-fumatori e da quella dei Non-fumatori risultava particolarmente complesso a causa dello sbilanciamento delle classi e della possibile sovrapposizione nei pattern dei dati; ci siamo accorti però che tutti i modelli allenati e perfezionati fino ad ora, avevano una cosa in comune: non riuscivano a separare correttamente la classe degli Ex-fumatori da quella dei Fumatori. Facendo poi un'analisi ancora più approfondita dei risultati, in particol modo delle matrici dei confusione ottenute, ci siamo però accorti che uno dei modelli testati nel progetto riusciva piuttosto bene a non classificare i Non Fumatori rispetto ai Fumatori o Ex-fumatori: si tratta del modello Random Forest. 
 
-[...Screen matrice di confusione per far capire e giustificare il perchè abbiamo usato un classificatore gerarchico???...]
+[...Screen matrice di confusione per far capire e giustificare il perchè abbiamo usato un classificatore gerarchico...]
 
 Abbiamo quindi deciso di fare un ultimo tentativo per cercare di migliorare i risultati ottenuti fino a questo punto del progetto, sperimentando un approccio gerarchico alla classificazione e suddividento il problema in 2 fasi distinte:
 
 - `Primo classificatore:` un modello iniziale per distinguere tra Non-fumatori e la classe unificata Ex-fumatori + Fumatori.
 - `Secondo classificatore:` un modello specifico addestrato per separare i campioni precedentemente classificati come Ex-fumatori + Fumatori, suddividendoli nelle due classi originali.
 
-L'idea alla base di questa strategia è che un primo modello possa apprendere meglio le caratteristiche distintive tra chi non ha mai fumato e chi, invece, ha avuto un'esposizione al fumo e successivamente il secondo classificatore può concentrarsi sulla separazione tra Ex-fumatori e Fumatori attuali, che presentano differenze più sottili e meno evidenti rispetto alla distinzione con i Non-fumatori.  Abbiamo dunque fatto una ricerca su quello che potesse essere un primo modello ottimale che potesse distinguere la classe dei Non-fumatori e la classe unificata Ex-fumatori + Fumatori e di seguito una ricerca analoga per selezionare il secondo modello.
+L'idea alla base di questa strategia è che un primo modello possa apprendere meglio le caratteristiche distintive tra chi non ha mai fumato e chi, invece, ha avuto un'esposizione al fumo e successivamente il secondo classificatore può concentrarsi sulla separazione tra Ex-fumatori e Fumatori attuali, che presentano differenze più sottili e meno evidenti rispetto alla distinzione con i Non-fumatori.  Abbiamo dunque fatto una ricerca su quello che potesse essere un primo modello ottimale che potesse distinguere la classe dei Non-fumatori e la classe unificata Ex-fumatori + Fumatori e di seguito una ricerca analoga per selezionare il secondo modello. I nostri test hanno evidenziato come il miglior modello per riuscire a separare i Non-fumatori dalla classe unificata Ex-fumatori + Fumatori è lo Stacking Classifier, mentre per quanto riguarda il secondo modello il migliore i grado di separare Ex-fumatori e Fumatori è la Random Forest (anche lo Stacking Classifier si avvicina molto come performance).
 
-[...Riportare scelte fatte per i 2 modelli...]
-[...Cosa diciamo per il modello finale? Quale lasciamo?...]
+Nonostante l'idea di partenza ci sembrasse buona, ci siamo però accorti di quanto non fosse banale costruire un classificatore di questo tipo: il fatto che il primo modello potesse classificare erroneamente dei sample con label "Non-fumatore" come "Ex-fumatore o Fumatore" e che poi dovessere essere classificati come "Ex-fumatore" o "Fumatore" ci ha creato dei grossi problemi nella creazione del modello che avevamo in mente noi. Difatti alla fine siamo stati costretti ad allenare il secondo modello con tutte e 3 le label iniziali e non solo sulle label di "Ex-fumatore" e "Fumatore" come avevamo in mente all'inizio.  Un'altra alternativa che ci era venuta in mente, è stata quella di allenare due modelli totalmente separati (il primo con label "Non-fumatore" e "Ex-fumatore o Fumatore" ed il secondo con label "Ex-fumatore" e "Fumatore") con una porzione del dataset, e in un secondo momento utilizzare il restante dataset come test; non abbiamo implementato questa alternativa per il semplice motivo che non sarebbe stato possibile avere dei risultati direttamente comparabili con quelli ottenuti fino a questo punto.
 
 #### Notebook di riferimento:
 
 - `separation_smokers_non_smokers.ipynb`
 - `separation_ex_smokers_non_smokers.ipynb`
-- [...]
+- `multistep_smokers_test.ipynb`
 
 ### Visualizzazione dati tramite t-SNE
 
+Per farci un'idea più generale di quello che potesse essere la distribuzione nello spazio dei dati presenti nel dataset, abbiamo anche sfruttato la tecnica di t-SNE; in questo modo abbiamo potuto visualizzare quanto effettivamente le classi del nostro dataset fossero sovrapposte tra di loro. Ovviamente per rendere il tutto più comprensibile, abbiamo "plottato" il tutto in uno spazio a 2 dimensioni e considerando in un primo test le label "Non-fumatore" e "Ex-fumatore o Fumatore" accorpate in una unica classe ed in un secondo test le classi "Ex-fumatore" e "Fumatore".
 
+#### Notebook di riferimento:
+
+- `data_visualization.ipynb`
 
 ## Risultati
 
@@ -221,8 +218,5 @@ L'idea alla base di questa strategia è che un primo modello possa apprendere me
 - Commentare come mai con feature engeneering non migliora la situa
 - Commentare come mai con pca non migliora la situa
 - Aggiungere i link bibliografici
-- Fare un po' di cross validation
-- Far girare i notebook che separano le classi dello smoking
 - Se i risultati di model stacking sono migliori con combinazioni diverse, cambia anche dentro i notebook "separation"
-- Decidere cosa lasciare come classificatore gerarchico
 - Sistemare il notebook di datavisualization
