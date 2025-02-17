@@ -163,13 +163,52 @@ Arrivati a questo punto del progetto non ci rimanevano molti modelli/tecniche da
 - Volevamo provare a fondere la tecnica del boosting (caratteristica di AdaBoost) con la tecnica del bagging ensemble
 - Siccome il tempo per il training di un modello di SVM non lineare scala in maniera quadratica con il numero di sample, era proibitivo allenare un modello singolo di questo tipo anche solo utilizzando il 50% del dataset (500.000 sample); dunque abbiamo optato per utilizzare la tecnica dell'ensemble utilizzando più modelli SVM non lineari ma allenati ognuno su una porzione ristretta del dataset.
 
-Non abbiamo testato la tecnica del bagging ensemble per altri modelli come Random Forest perchè secondo il nostro parere non avrebbe apportato un beneficio significativo: nel caso della Random Forest il bagging è già un componente fondamentale del modello stesso in cui vengono costruiti più alberi su sottocampioni del dataset e poi aggregati tramite voto maggioritario, mentre per quanto riguarda KNN, il bagging non risulta particolarmente efficace perchè il suo comportamento dipende essenzialmente dalla scelta dei vicini più prossimi e dalla distanza utilizzata, piuttosto che dalla varianza del dataset.
+Non abbiamo testato la tecnica del bagging ensemble per altri modelli come Random Forest perchè secondo il nostro parere non avrebbe apportato un beneficio significativo: nel caso della Random Forest il bagging è già un componente fondamentale del modello stesso in cui vengono costruiti più alberi su sottocampioni del dataset e poi aggregati tramite voto maggioritario, mentre per quanto riguarda KNN, il bagging non risulta particolarmente efficace perchè il suo comportamento dipende essenzialmente dalla scelta dei vicini più prossimi e dalla distanza utilizzata.
 
 #### Notebook di riferimento:
 
 - `bagging_ensemble.ipynb`
 
 ### Stacking Classifier e Voting Classifier
+
+Altre 2 tecniche di ensemble che abbiamo testato, sono state lo Stacking e il Voting Classifier: entrambi i metodi mirano a combinare più modelli per ottenere una predizione finale più robusta come nel caso del bagging e del boosting, ma con approcci differenti.
+
+- Lo Stacking sfrutta un livello aggiuntivo di apprendimento rispetto al bagging, in quanto i risultati dei singoli modelli base utilizzati vengono sfruttati come input per un meta-modello, che impara a combinare le loro predizioni in modo ottimale; abbiamo selezionato come modelli base tutti quelli che abbiamo sfruttato nei test precedenti (escluso il SVM lineare) e abbiamo utilizzato come meta-modello un SVM con kernel lineare.  Questa scelta è stata fatta per un motivo semplice: il modello Random Forest fino a questo momento è risultato il migliore e abbiamo pensato innanzitutto che fosse corretto sfruttarlo come modello base all'interno dello stacking piuttosto che come meta-modello finale e che fosse invece sbagliato inserirlo sia come modello base che come meta-modello, perchè avrebbe ridotto la diversità del sistema di ensemble. La scelta del meta-modello è dunque ricaduta sul SVM lineare vista la sua velocità di training e i comunque buoni risultati che ci aveva garantito fino a questo punto del progetto.
+- Il Voting Classifier, invece, segue un approccio più semplice: aggrega le predizioni dei vari modelli base attraverso una strategia di voto, che può essere di tipo hard voting (sceglie la classe con più voti tra i modelli) o soft voting (media delle probabilità predette).
+
+#### Notebook di riferimento:
+
+- `model_stacking.ipynb`
+
+### Classificatore gerarchico
+
+Arrivati a questo punto del progetto, ci siamo resi conto che l'obiettivo di separare in maniera sempre più precisa la classe dei Fumatori da quella degli Ex-fumatori e da quella dei Non-fumatori risultava particolarmente complesso a causa dello sbilanciamento delle classi e della possibile sovrapposizione nei pattern dei dati; ci siamo accorti però che tutti i modelli allenati e perfezionati fino ad ora, avevano una cosa in comune: non riuscivano a separare correttamente la classe degli Ex-fumatori da quella dei Fumatori. Facendo poi un'analisi ancora più approfondita dei risultati, in particol modo delle matrici dei confusione ottenute, ci siamo però accorti che uno dei modelli testati nel progetto riusciva piuttosto bene a non classificare i Non Fumatori rispetto ai Fumatori o Ex-fumatori: si tratta del modello Random Forest. 
+
+[...Screen matrice di confusione per far capire e giustificare il perchè abbiamo usato un classificatore gerarchico???...]
+
+Abbiamo quindi deciso di fare un ultimo tentativo per cercare di migliorare i risultati ottenuti fino a questo punto del progetto, sperimentando un approccio gerarchico alla classificazione e suddividento il problema in 2 fasi distinte:
+
+- `Primo classificatore:` un modello iniziale per distinguere tra Non-fumatori e la classe unificata Ex-fumatori + Fumatori.
+- `Secondo classificatore:` un modello specifico addestrato per separare i campioni precedentemente classificati come Ex-fumatori + Fumatori, suddividendoli nelle due classi originali.
+
+L'idea alla base di questa strategia è che un primo modello possa apprendere meglio le caratteristiche distintive tra chi non ha mai fumato e chi, invece, ha avuto un'esposizione al fumo e successivamente il secondo classificatore può concentrarsi sulla separazione tra Ex-fumatori e Fumatori attuali, che presentano differenze più sottili e meno evidenti rispetto alla distinzione con i Non-fumatori.  Abbiamo dunque fatto una ricerca su quello che potesse essere un primo modello ottimale che potesse distinguere la classe dei Non-fumatori e la classe unificata Ex-fumatori + Fumatori e di seguito una ricerca analoga per selezionare il secondo modello.
+
+[...Riportare scelte fatte per i 2 modelli...]
+[...Cosa diciamo per il modello finale? Quale lasciamo?...]
+
+#### Notebook di riferimento:
+
+- `separation_smokers_non_smokers.ipynb`
+- `separation_ex_smokers_non_smokers.ipynb`
+- [...]
+
+### Visualizzazione dati tramite t-SNE
+
+
+
+## Risultati
+
+## Conclusione
 
 ## Bibliografia
 
@@ -184,3 +223,6 @@ Non abbiamo testato la tecnica del bagging ensemble per altri modelli come Rando
 - Aggiungere i link bibliografici
 - Fare un po' di cross validation
 - Far girare i notebook che separano le classi dello smoking
+- Se i risultati di model stacking sono migliori con combinazioni diverse, cambia anche dentro i notebook "separation"
+- Decidere cosa lasciare come classificatore gerarchico
+- Sistemare il notebook di datavisualization
