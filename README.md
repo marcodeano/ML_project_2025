@@ -14,6 +14,7 @@ Marco Giacopuzzi, matricola VR509643
 - **Dataset preso in analisi ed obiettivi del progetto**
 - **State Of The Art**
 - **Metodologie, modelli ed algoritmi utilizzati**
+- **Risultati**
 - **Conclusioni**
 - **Biliografia**
 
@@ -178,7 +179,9 @@ Altre 2 tecniche di ensemble che abbiamo testato, sono state lo Stacking e il Vo
 
 Arrivati a questo punto del progetto, ci siamo resi conto che l'obiettivo di separare in maniera sempre più precisa la classe dei Fumatori da quella degli Ex-fumatori e da quella dei Non-fumatori risultava particolarmente complesso a causa dello sbilanciamento delle classi e della possibile sovrapposizione nei pattern dei dati; ci siamo accorti però che tutti i modelli allenati e perfezionati fino ad ora, avevano una cosa in comune: non riuscivano a separare correttamente la classe degli Ex-fumatori da quella dei Fumatori. Facendo poi un'analisi ancora più approfondita dei risultati, in particol modo delle matrici dei confusione ottenute, ci siamo però accorti che uno dei modelli testati nel progetto riusciva piuttosto bene a non classificare i Non Fumatori rispetto ai Fumatori o Ex-fumatori: si tratta del modello Random Forest. 
 
-[...Screen matrice di confusione per far capire e giustificare il perchè abbiamo usato un classificatore gerarchico...]
+<p align="center">
+    <img src="screen_results/confusion_matrix_rf_optimized_s.png" alt="Confusion Matrix della Random Forest ottimizzata" width="300" height="300">
+</p>
 
 Abbiamo quindi deciso di fare un ultimo tentativo per cercare di migliorare i risultati ottenuti fino a questo punto del progetto, sperimentando un approccio gerarchico alla classificazione e suddividento il problema in 2 fasi distinte:
 
