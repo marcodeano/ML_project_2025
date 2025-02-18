@@ -138,25 +138,16 @@ def split_dataset_v2(dataset):
     return X_smoke, Y_smoke, X_drink, Y_drink
 
 def plot_confusion_matrix(y_true, y_pred, display_labels, title, cmap='viridis'):
-    # Compute normalized confusion matrix
+
     cm = confusion_matrix(y_true, y_pred, normalize='true')
-    
-    # Create a figure and an axis
     _, ax = plt.subplots(figsize=(6, 6))
-    
-    # Create and plot the confusion matrix display
     cm_display = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=display_labels)
     cm_display.plot(ax=ax, cmap=cmap, colorbar=False)
-    
-    # Set plot title and labels
     ax.set_title(title, fontsize=14)
     ax.set_xlabel('Predicted Label', fontsize=12)
     ax.set_ylabel('True Label', fontsize=12)
-    
-    # Rotate y-tick labels for better readability
+
     plt.setp(ax.get_yticklabels(), rotation=45)
-    
-    # Adjust layout and display the plot
     plt.tight_layout()
     plt.show()
 

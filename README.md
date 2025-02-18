@@ -96,10 +96,12 @@ Come si evincerà di seguito, nel nostro progetto abbiamo testato modelli di Mac
 Prima di applicare qualsiasi modello di Machine Learning, è fondamentale preparare il dataset in modo che si possano sfruttare al meglio le potenzialità dei vari modelli di apprendimento; abbiamo dunque nell'ordine:  
 
 1. Fatto una prima analisi dettagliata del dataset protagonista del progetto di Machine Learning ed estrapolato quindi tutte le informazioni utili per comprenderne la struttura; più nello specifico abbiamo ricavato, tramite dei semplici script, la distribuzione dei valori per le varie feature, la distribuzione delle classi in tutto il dataset e tracciato dei "boxplot" per individuare la presenza di eventuali outlier che possono interferire con il training dei vari modelli che verranno utilizzati nel progetto.
-2. Identificato i valori fuori scala (outlier): l'analisi dettagliata del dataset fatta al passo precedente, ci ha permesso di individuare facilmente molti degli outlier più evidenti (che presentavano valori estremamente distanti dalla media, es: waistline = 999) ed eliminarli dal dataset, ma ci ha anche spinti ad utilizzare uno strumento statistico per individuare gli outlier un po' meno evidenti ma comunque anomali rispetto alla distribuzione generale del dataset. A tale scopo abbiamo utilizzato lo Z-score: una misura statistica che indica di quante deviazioni standard un valore di una feature si discosta dalla media; per definire la soglia di esclusione dei sample, abbiamo stabilito un valore limite di Z-score pari a 5, oltre il quale i campioni vengono considerati anomali ed esclusi dal dataset. In questo modo abbiamo escluso da tutte le operazioni di predizione future, tutti quei sample che o hanno valori errati oppure rappresentano casi clinici particolari che andrebbero ad influire negativamente sui risultati del progetto.
+2. Identificato i valori fuori scala (outlier): l'analisi dettagliata del dataset fatta al passo precedente, ci ha permesso di individuare facilmente molti degli outlier più evidenti (che presentavano valori estremamente distanti dalla media, es: waistline = 999) ed eliminarli dal dataset, ma ci ha anche spinti ad utilizzare uno strumento statistico per individuare gli outlier un po' meno evidenti ma comunque anomali rispetto alla distribuzione generale del dataset. A tale scopo abbiamo utilizzato lo Z-score[3]: una misura statistica che indica di quante deviazioni standard un valore di una feature si discosta dalla media; per definire la soglia di esclusione dei sample, abbiamo stabilito un valore limite di Z-score pari a 5, oltre il quale i campioni vengono considerati anomali ed esclusi dal dataset. In questo modo abbiamo escluso da tutte le operazioni di predizione future, tutti quei sample che o hanno valori errati oppure rappresentano casi clinici particolari che andrebbero ad influire negativamente sui risultati del progetto.
 3. Fatto encoding delle variabili categoriali: più nel dettaglio Label Encoding (non si è reso necessario il One-Hot Encoding visto che le uniche feature categoriali sono "sex" e le label delle classi). 
 
 Abbiamo concordato, terminati questi passaggi, non fosse necessario eseguire subito uno scaling dei dati (visto che sono presenti features con valori molto grandi e altre con valori più piccoli), perchè abbiamo ritenuto essere più opportuno fare queste operazioni eventualmente in un secondo momento a seconda dei modelli di Machine Learning che avremmo utilizzato.
+
+Inoltre, nonostante avessimo inizialmente pensato di utilizzare le ground truth dello smoke come feature per la classificazione del drink (e viceversa), abbiamo deciso di abbandonare questa strategia dopo aver effettuato alcuni test preliminari, in quanto l'inclusione di queste non aveva portato a un miglioramento delle performance dei modelli.
 
 #### Script e notebook di riferimento:
 - `load_data_and_distribution_analisys.py`
@@ -183,7 +185,7 @@ Di conseguenza, un profilo lipidico instabile e un disequilibrio nei rapporti me
 - **AIP**: Valuta sinteticamente il rischio cardiovascolare tramite il logaritmo di trigliceridi/HDL.
 - **TyG**: Indica resistenza insulinica e rischio metabolico calcolando trigliceridi e glucosio.
 
-#### Funzione Epatica e Renale
+#### Funzione Epatica e Renale[4]
 
 L'inclusione di indicatori per la funzione epatica e renale è vantaggiosa perché cambiamenti in questi parametri possono essere segnali indiretti di danni organici causati dal fumo e dal consumo di alcol.
 Queste azioni aiutano a identificare stili di vita a rischio fornendo informazioni sullo stato degli organi.
@@ -1091,16 +1093,25 @@ Di seguito vengono riportati i grafici della distribuzione nello spazio dei dati
 
 ## Conclusioni
 
+I risultati ottenuti in questo progetto, purtroppo non sono stati all’altezza delle aspettative iniziali: infatti nonostante l’impiego di modelli avanzati e di diverse tecniche di miglioramento, le metriche finali non hanno mostrato un miglioramento significativo rispetto a quelle ottenute con il modello più semplice utilizzato all’inizio del progetto.
+
+Una delle possibili cause di questa difficoltà potrebbe risiedere nella natura stessa del problema di classificazione affrontato; come già accennato più volte e come si è potuto evincere dall'analisi visiva dei dati tramite t-SNE e PCA, la distinzione tra ex-fumatori e fumatori si è rivelata particolarmente complessa e tutto sommato risulta comprensibile se si considera che la classe degli ex-fumatori è per sua natura "ambigua": il dataset non fornisce informazioni dettagliate su da quanto tempo queste persone abbiano smesso di fumare, né su eventuali ricadute nel corso del tempo. Inoltre, non è da escludere che alcuni pazienti abbiano fornito dichiarazioni false o imprecise riguardo alle proprie abitudini, il che potrebbe aver introdotto ulteriore rumore nei dati.
+
+Inoltre, nonostante fosse pronosticabile che il dataset non fosse per nulla linearmente separabile, tutti i test effettuati hanno evidenziato che molto probabilmente non esista nemmeno una chiara separazione non lineare tra le classi; sebbene quindi siano stati testati svariati modelli predittivi e siano state implementate tecniche avanzate come feature engineering, bagging, stacking e altre strategie di ensemble learning, nessuna di queste ha portato a un incremento significativo delle prestazioni. Uno dei motivi potrebbe essere che il limite non risiede nell’architettura dei modelli in sè ma nella qualità dei dati: probabilmente nè le feature disponibili nè quelle aggiunte tramite feature egeneering sono sufficientemente rilevanti per poter distinguere in modo netto i tre gruppi e ciò ha quindi reso difficile per qualsiasi modello di Machine Learning individuare pattern chiari. Un altro motivo potrebbe essere legato alla eterogeneità dei soggetti presenti nel dataset: alcuni individui infatti potrebbero non mostrare alterazioni significative nei parametri rappresentati dalle features, pur appartenendo a classi diverse, oppure potrebbero essere presenti nel dataset casi patologici di persone con malattie o condizioni particolari che influenzano la predizione dei modelli a prescindere dal fatto che fumino o bevano. Questi elementi potrebbero quindi introdurre rumore nei dati, impedendo la capacità dei modelli di apprendere una separazione chiara tra le classi.
+
+A prescindere da queste difficoltà, riteniamo che l’approccio basato sul classificatore gerarchico sia il più sensato per affrontare questo problema, anche se non siamo riusciti a implementarlo esattamente come avevamo previsto: abbiamo comunque ottenuto un primo modello in grado di separare i non fumatori dal gruppo ex-fumatori + fumatori ed idealmente allenando il secondo modello in modo che distingua solo ex-fumatori e fumatori, si potrebbe migliorare ulteriormente la classificazione complessiva. Come già discusso in precedenza però, per garantire risultati confrontabili con gli altri modelli testati abbiamo dovuto allenare il secondo classificatore su tutte e tre le classi anziché solo sulle due previste nella suddivisione gerarchica ideale.
+
+Nel complesso però la Random Forest si è dimostrata il miglior modello per il nostro problema di classificazione e questo probabilmente grazie alla sua robustezza nei confronti di dati rumorosi, alla sua capacità di gestire feature non lineari e forse anche alla sua natura ensemble che combina più alberi decisionali per ridurre l’overfitting e ottenere previsioni più stabili rispetto ad altri modelli testati.
+
+Per concludere, questo studio oltre ad aver messo in evidenza la difficoltà intrinseca della classificazione tra fumatori ed ex-fumatori, ha mostrato che in alcuni casi il miglioramento delle prestazioni non può essere raggiunto solo attraverso tecniche più avanzate di Machine Learing, ma richiederebbe dati più dettagliati e informativi. Sarebbe inoltre necessario testare tecniche di apprendimento più avanzate come le Reti Neurali, che potrebbero essere in grado di individuare pattern complessi che modelli classici di Machine Learning non riescono a cogliere.
+
 ## Bibliografia
 
-[1]https://www.kaggle.com/datasets/sooyoungher/smoking-drinking-dataset
-
-[2] https://www.digital4.biz/executive/medicina-e-intelligenza-artificiale-come-le-macchine-possono-migliorare-la-nostra-salute/
+[1]https://www.kaggle.com/datasets/sooyoungher/smoking-drinking-dataset  
+[2]https://www.digital4.biz/executive/medicina-e-intelligenza-artificiale-come-le-macchine-possono-migliorare-la-nostra-salute/  
+[3]https://datascience.eu/it/matematica-e-statistica/cose-uno-z-score/  
+[4]https://doi.org/10.7326/0003-4819-150-9-200905050-00006
 
 # DA FARE 
 
-- Commentare come mai con feature engeneering non migliora la situa
-- Commentare come mai con pca non migliora la situa
-- Aggiungere i link bibliografici
-- Sistemare il notebook di datavisualization
 - Aggiungere i parametri inseriti nei vari modelli
