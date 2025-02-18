@@ -89,7 +89,7 @@ Come si evincerà di seguito, nel nostro progetto abbiamo testato modelli di Mac
 - **Ottimizzazione degli iperparametri:** tramite "Grid Search" sono stati testati i vari modelli con combinazioni di iperparametri differenti, con l'obiettivo di trovare quella che più si adatta al nostro problema.
 - **Principal Component Analysis:** per ridurre la dimensionalità mantenendo la maggior parte della varianza, per molti modelli predittivi risulta sempre utile apllicare la PCA.
 - **Tecniche di ensemble prediction:** spesso utilizzare solo un modello per fare predizioni su un dataset molto grande, non è la scelta migliore ed il rischio è che vengano fatte predizioni corrette per certe classi e per altre meno; proprio per questo sfrutteremo tecniche di ensemble prediction (come bagging, boosting e stacking) per cercare di predirre in maniera più robusta le classi dei vari sample.
-- **Classificazione gerarchica:** un ulteriore passo è stato l’introduzione di una strategia di classificazione gerarchica, particolarmente utile per gestire il problema dell’imbalanciamento delle classi soprattutto per la task sul fumo.
+- **Classificazione gerarchica:** un ulteriore passo è stato l’introduzione di una strategia di classificazione gerarchica, particolarmente utile per gestire il problema dello sbilanciamento delle classi soprattutto per la task sul fumo.
 
 ### Preprocessing e pulizia del dataset
 
