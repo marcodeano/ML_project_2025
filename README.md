@@ -125,6 +125,12 @@ Per validare ulteriormente il nostro approccio, abbiamo infine applicato la cros
 
 Dopo tutte queste analisi, la Random Forest si è dimostrata un modello solido, in grado di ottenere buoni risultati con un tempo di addestramento contenuto; inoltre, come si è potuto evincere, non si sono rese necessarie operazioni come Scaling dei dati o Dimensionality Reduction e questo perchè il modello Random Forest non è influenzato da grandezze diverse tra le feature e gestisce bene dati ad alta dimensionalità.
 
+#### Valori selezionati per gli iperparametri:
+
+- n_estimators=100 
+- max_depth=20 
+- min_samples_split=50
+
 #### Notebook di riferimento:
 
 - `random_forest_classifier_base_model.ipynb`
@@ -143,6 +149,12 @@ I modelli allenati e testati sono stati:
 Ovviamente prima di allenare questi modelli, ci siamo assicurati di normalizzare i dati di train e test per ottenere le migliori performance possibili.
 
 Oltre a testare questi modelli nella loro versione base e con iperparametri ottimi, abbiamo anche testato l'applicazione di PCA come tecnica di Dimensionality Reduction (ovviamente solo per il modello KNN ed il modello SVM, per il modello AdaBoost con base_estimator Albero Decisionale abbiamo ritenuto fosse non necessario): difatto avendo a che fare con un dataset con 22 feature e avendo gia testato la tecnica della feature selection, volevamo valutare se la riduzione della dimensionalità tramite PCA potesse migliorare le prestazioni dei modelli.  Anche per quanto riguarda l'utilizzo di questa tecnica con i modelli sopra citati, non abbiamo creato un notebook contenente tutti i passaggi per selezionare il miglior numero di componenti da passare come parametro alla PCA, ma abbiamo lasciato solamente la versione che ci ha permesso di ottenere i migliori risultati.
+
+#### Valori selezionati per gli iperparametri:
+
+- AdaBoostClassifier(n_estimators=200)
+- LinearSVC(C=0.1)
+- KNeighborsClassifier(n_neighbors=500)
 
 #### Notebook di riferimento:
 
@@ -211,6 +223,11 @@ Arrivati a questo punto del progetto non ci rimanevano molti modelli/tecniche da
 
 Non abbiamo testato la tecnica del bagging ensemble per altri modelli come Random Forest perchè secondo il nostro parere non avrebbe apportato un beneficio significativo: nel caso della Random Forest il bagging è già un componente fondamentale del modello stesso in cui vengono costruiti più alberi su sottocampioni del dataset e poi aggregati tramite voto maggioritario, mentre per quanto riguarda KNN, il bagging non risulta particolarmente efficace perchè il suo comportamento dipende essenzialmente dalla scelta dei vicini più prossimi e dalla distanza utilizzata.
 
+#### Valori selezionati per gli iperparametri:
+
+- BaggingClassifier(estimator=SVC(kernel='rbf', C=1), n_estimators=30, max_samples=0.1)
+- BaggingClassifier(estimator=AdaBoostClassifier(n_estimators=50), n_estimators=100)
+
 #### Notebook di riferimento:
 
 - `bagging_ensemble.ipynb`
@@ -239,7 +256,7 @@ Abbiamo quindi deciso di fare un ultimo tentativo per cercare di migliorare i ri
 - `Primo classificatore:` un modello iniziale per distinguere tra Non-fumatori e la classe unificata Ex-fumatori + Fumatori.
 - `Secondo classificatore:` un modello specifico addestrato per separare i campioni precedentemente classificati come Ex-fumatori + Fumatori, suddividendoli nelle due classi originali.
 
-L'idea alla base di questa strategia è che un primo modello possa apprendere meglio le caratteristiche distintive tra chi non ha mai fumato e chi, invece, ha avuto un'esposizione al fumo e successivamente il secondo classificatore può concentrarsi sulla separazione tra Ex-fumatori e Fumatori attuali, che presentano differenze più sottili e meno evidenti rispetto alla distinzione con i Non-fumatori.  Abbiamo dunque fatto una ricerca su quello che potesse essere un primo modello ottimale che potesse distinguere la classe dei Non-fumatori e la classe unificata Ex-fumatori + Fumatori e di seguito una ricerca analoga per selezionare il secondo modello. I nostri test hanno evidenziato come il miglior modello per riuscire a separare i Non-fumatori dalla classe unificata Ex-fumatori + Fumatori è lo Stacking Classifier, mentre per quanto riguarda il secondo modello il migliore i grado di separare Ex-fumatori e Fumatori è la Random Forest (anche lo Stacking Classifier si avvicina molto come performance).
+L'idea alla base di questa strategia è che venga allenato un primo modello in modo che possa distinguere chi non ha mai fumato da chi, invece, ha avuto un'esposizione al fumo e successivamente venga allenato un secondo classificatore che può invece concentrarsi sulla separazione tra Ex-fumatori e Fumatori attuali, che presentano differenze più sottili e meno evidenti rispetto alla distinzione con i Non-fumatori.  Abbiamo dunque fatto una ricerca su quello che potesse essere un primo modello ottimale che potesse distinguere la classe dei Non-fumatori e la classe unificata Ex-fumatori + Fumatori e di seguito una ricerca analoga per selezionare il secondo modello. I nostri test hanno evidenziato come il miglior modello per riuscire a separare i Non-fumatori dalla classe unificata Ex-fumatori + Fumatori è lo Stacking Classifier, mentre per quanto riguarda il secondo modello il migliore i grado di separare Ex-fumatori e Fumatori è la Random Forest (anche lo Stacking Classifier si avvicina molto come performance).
 
 Nonostante l'idea di partenza ci sembrasse buona, ci siamo però accorti di quanto non fosse banale costruire un classificatore di questo tipo: il fatto che il primo modello potesse classificare erroneamente dei sample con label "Non-fumatore" come "Ex-fumatore o Fumatore" e che poi dovessere essere classificati come "Ex-fumatore" o "Fumatore" ci ha creato dei grossi problemi nella creazione del modello che avevamo in mente noi. Difatti alla fine siamo stati costretti ad allenare il secondo modello con tutte e 3 le label iniziali e non solo sulle label di "Ex-fumatore" e "Fumatore" come avevamo in mente all'inizio.  Un'altra alternativa che ci era venuta in mente, è stata quella di allenare due modelli totalmente separati (il primo con label "Non-fumatore" e "Ex-fumatore o Fumatore" ed il secondo con label "Ex-fumatore" e "Fumatore") con una porzione del dataset, e in un secondo momento utilizzare il restante dataset come test; non abbiamo implementato questa alternativa per il semplice motivo che non sarebbe stato possibile avere dei risultati direttamente comparabili con quelli ottenuti fino a questo punto.
 
@@ -1065,7 +1082,7 @@ Confusion matrix:
 
 ### Visualization separation of classes
 
-Di seguito vengono riportati i grafici della distribuzione nello spazio dei dati presenti nel dataset, ottenuti sfruttando le tecniche di t-SNE e PCA; in questo modo abbiamo potuto visualizzare quanto effettivamente le classi del nostro dataset fossero sovrapposte tra di loro.  Ovviamente per rendere il tutto più comprensibile, abbiamo "plottato" il tutto in uno spazio a 2 dimensioni e considerando in un primo momento le label "Non-fumatore" e "Ex-fumatore o Fumatore" accorpate in una unica classe ed in un secondo momento le classi "Ex-fumatore" e "Fumatore".  Come si può evincere, la divisione "Non-fumatore" e "Ex-fumatore o Fumatore" è abbastanza marcata e facile da individuare, mentre per l'altra divisione si nota una netta sovrapposizione dei dati delle due classi, suggerendo dunque la difficoltà nel riuscire a distinguere in maniera anche solo parziale le due classi.  Per ottenere risultati in tempi contenuti, abbiamo utilizzato solo il 10% del dataset.
+Di seguito vengono riportate le distribuzioni nello spazio dei dati presenti nel dataset, ottenuti sfruttando le tecniche di t-SNE e PCA; in questo modo abbiamo potuto visualizzare quanto effettivamente le classi del nostro dataset fossero sovrapposte tra di loro.  Ovviamente per rendere il tutto più comprensibile, abbiamo "plottato" il tutto in uno spazio a 2 dimensioni e considerando in un primo momento le label "Non-fumatore" e "Ex-fumatore o Fumatore" accorpate in una unica classe ed in un secondo momento le classi "Ex-fumatore" e "Fumatore".  Come si può vedere, la divisione "Non-fumatore" e "Ex-fumatore o Fumatore" è abbastanza marcata e facile da individuare, mentre per l'altra divisione si nota una netta sovrapposizione dei dati delle due classi, marcando dunque la difficoltà nel riuscire a distinguere in maniera anche solo parziale le due classi.  Per ottenere risultati in tempi contenuti, abbiamo utilizzato solo il 10% del dataset.
 
 #### t-SNE "Non-fumatore" e "Ex-fumatore o Fumatore" 
 
@@ -1093,11 +1110,11 @@ Di seguito vengono riportati i grafici della distribuzione nello spazio dei dati
 
 ## Conclusioni
 
-I risultati ottenuti in questo progetto, purtroppo non sono stati all’altezza delle aspettative iniziali: infatti nonostante l’impiego di modelli avanzati e di diverse tecniche di miglioramento, le metriche finali non hanno mostrato un miglioramento significativo rispetto a quelle ottenute con il modello più semplice utilizzato all’inizio del progetto.
+I risultati ottenuti in questo progetto, purtroppo non ci hanno soddisfatto pienamente: infatti nonostante l’impiego di modelli avanzati e di diverse tecniche di miglioramento, le metriche finali non hanno mostrato un miglioramento significativo rispetto a quelle ottenute con il modello più semplice utilizzato all’inizio del progetto.
 
-Una delle possibili cause di questa difficoltà potrebbe risiedere nella natura stessa del problema di classificazione affrontato; come già accennato più volte e come si è potuto evincere dall'analisi visiva dei dati tramite t-SNE e PCA, la distinzione tra ex-fumatori e fumatori si è rivelata particolarmente complessa e tutto sommato risulta comprensibile se si considera che la classe degli ex-fumatori è per sua natura "ambigua": il dataset non fornisce informazioni dettagliate su da quanto tempo queste persone abbiano smesso di fumare, né su eventuali ricadute nel corso del tempo. Inoltre, non è da escludere che alcuni pazienti abbiano fornito dichiarazioni false o imprecise riguardo alle proprie abitudini, il che potrebbe aver introdotto ulteriore rumore nei dati.
+Una delle possibili cause di questa difficoltà potrebbe risiedere nella natura stessa del problema di classificazione affrontato; come già accennato più volte e come si è potuto evincere dall'analisi visiva dei dati tramite t-SNE e PCA, la distinzione tra ex-fumatori e fumatori si è rivelata particolarmente complessa e tutto sommato risulta comprensibile se si considera che la classe degli ex-fumatori è per sua natura "ambigua": il dataset non fornisce informazioni dettagliate riguardo da quanto tempo queste persone abbiano smesso di fumare per esempio. Inoltre, non è da escludere che alcuni pazienti abbiano fornito dicharazioni false o imprecise riguardo alle proprie abitudini, il che potrebbe aver introdotto degli errori a priori nelle label dei sample.
 
-Inoltre, nonostante fosse pronosticabile che il dataset non fosse per nulla linearmente separabile, tutti i test effettuati hanno evidenziato che molto probabilmente non esista nemmeno una chiara separazione non lineare tra le classi; sebbene quindi siano stati testati svariati modelli predittivi e siano state implementate tecniche avanzate come feature engineering, bagging, stacking e altre strategie di ensemble learning, nessuna di queste ha portato a un incremento significativo delle prestazioni. Uno dei motivi potrebbe essere che il limite non risiede nell’architettura dei modelli in sè ma nella qualità dei dati: probabilmente nè le feature disponibili nè quelle aggiunte tramite feature egeneering sono sufficientemente rilevanti per poter distinguere in modo netto i tre gruppi e ciò ha quindi reso difficile per qualsiasi modello di Machine Learning individuare pattern chiari. Un altro motivo potrebbe essere legato alla eterogeneità dei soggetti presenti nel dataset: alcuni individui infatti potrebbero non mostrare alterazioni significative nei parametri rappresentati dalle features, pur appartenendo a classi diverse, oppure potrebbero essere presenti nel dataset casi patologici di persone con malattie o condizioni particolari che influenzano la predizione dei modelli a prescindere dal fatto che fumino o bevano. Questi elementi potrebbero quindi introdurre rumore nei dati, impedendo la capacità dei modelli di apprendere una separazione chiara tra le classi.
+Inoltre, nonostante fosse pronosticabile che il dataset non fosse per nulla linearmente separabile, tutti i test effettuati hanno evidenziato che molto probabilmente non esista nemmeno una chiara separazione non lineare tra le classi; sebbene quindi siano stati testati svariati modelli predittivi e siano state implementate tecniche avanzate come feature engineering, bagging, stacking e altre strategie di ensemble learning, nessuna di queste ha portato a un incremento significativo delle prestazioni. Uno dei motivi potrebbe essere che il limite non risiede nei modelli utilizzati, ma nella qualità dei dati: probabilmente nè le feature disponibili nè quelle aggiunte tramite feature egeneering sono sufficientemente rilevanti per poter distinguere in modo netto i tre gruppi e ciò ha quindi reso difficile per qualsiasi modello di Machine Learning individuare pattern chiari. Un altro motivo potrebbe essere legato alla eterogeneità dei soggetti presenti nel dataset: alcuni individui infatti potrebbero non mostrare anomalie significative nei parametri rappresentati dalle features, pur magari essendo un bevitore o un fumatore abituale, oppure potrebbero essere presenti nel dataset casi patologici di persone con malattie o condizioni particolari che mostrano anomalie in una o più feature, andando cosi ad influenzare la predizione.
 
 A prescindere da queste difficoltà, riteniamo che l’approccio basato sul classificatore gerarchico sia il più sensato per affrontare questo problema, anche se non siamo riusciti a implementarlo esattamente come avevamo previsto: abbiamo comunque ottenuto un primo modello in grado di separare i non fumatori dal gruppo ex-fumatori + fumatori ed idealmente allenando il secondo modello in modo che distingua solo ex-fumatori e fumatori, si potrebbe migliorare ulteriormente la classificazione complessiva. Come già discusso in precedenza però, per garantire risultati confrontabili con gli altri modelli testati abbiamo dovuto allenare il secondo classificatore su tutte e tre le classi anziché solo sulle due previste nella suddivisione gerarchica ideale.
 
@@ -1111,7 +1128,3 @@ Per concludere, questo studio oltre ad aver messo in evidenza la difficoltà int
 [2]https://www.digital4.biz/executive/medicina-e-intelligenza-artificiale-come-le-macchine-possono-migliorare-la-nostra-salute/  
 [3]https://datascience.eu/it/matematica-e-statistica/cose-uno-z-score/  
 [4]https://doi.org/10.7326/0003-4819-150-9-200905050-00006
-
-# DA FARE 
-
-- Aggiungere i parametri inseriti nei vari modelli
